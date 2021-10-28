@@ -3,18 +3,54 @@ import React, { useEffect, useState } from "react";
 const FormNumField = (props) => {
   const [lowerLimit, setlowerLimit] = useState(null);
   const [upperLimit, setupperLimit] = useState(null);
+  const [specific, setSpecific] = useState({
+    variable: props.namevar,
+    limiteinf: lowerLimit,
+    limitesup: upperLimit,
+    igual: null,
+    tipo: "C",
+  });
 
   const handleChangeLower = (value) => {
     setlowerLimit(value);
   };
 
+  const handleChangeSpecific = (a, b) => {
+    setSpecific({
+      variable: specific.variable,
+      limiteinf: a,
+      limitesup: b,
+      igual: null,
+      tipo: "C",
+    });
+  };
+
   const handleChangeUpper = (value) => {
     setupperLimit(value);
   };
+
+  const hacer = () => {
+    let arr = [];
+    console.log("entramos");
+    console.log(props.createObject);
+    for (let i = 0; i < props.createObject.lenght; i++) {
+      if (props.createObject[i].variable != props.namevar) {
+        arr.push(props.createObject[i]);
+      }
+    }
+
+    arr.push(specific);
+    props.setcreateObject(arr);
+    console.log(props.createObject);
+
+    console.log("salimos");
+  };
+
   useEffect(() => {}, []);
 
   //console.log(lowerLimit);
   //console.log(upperLimit);
+  //console.log(specific);
   return (
     <div className="mb-3">
       <div>
@@ -32,6 +68,8 @@ const FormNumField = (props) => {
             aria-describedby="lowerlimit"
             onChange={(e) => {
               handleChangeLower(e.target.value);
+              handleChangeSpecific(e.target.value, upperLimit);
+              hacer();
             }}
           />
         </div>
@@ -46,6 +84,8 @@ const FormNumField = (props) => {
             aria-describedby="upperlimit"
             onChange={(e) => {
               handleChangeUpper(e.target.value);
+              handleChangeSpecific(lowerLimit, e.target.value);
+              hacer();
             }}
           />
         </div>

@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from "react";
-import FormNumField from "./formNumField";
-import FormCatField from "./formCatField";
+import { ArrowsAngleContract } from "react-bootstrap-icons";
+
 import Select from "react-select";
+
+const colourOptions = [
+  { value: "ocean", label: "Ocean" },
+  { value: "blue", label: "Blue" },
+  { value: "purple", label: "Purple" },
+  { value: "red", label: "Red" },
+  { value: "orange", label: "Orange" },
+  { value: "yellow", label: "Yellow" },
+  { value: "green", label: "Green" },
+  { value: "forest", label: "Forest" },
+  { value: "slate", label: "Slate" },
+  { value: "silver", label: "Silver" },
+];
 
 let fullList = [
   { value: "iq12", label: "IQ 12 meses", tipo: "C" },
@@ -21,8 +34,35 @@ const Groupform = () => {
   const [selectValue, setSelectValue] = useState(null);
   const [fList, setFList] = useState(fullList);
 
+  const [inputCatFields, setInputCatFields] = useState([]);
+
   const handleChange = (value) => {
     setSelectValue(value);
+  };
+
+  const handleChangeCat = (name, value) => {
+    let arr = [];
+    inputCatFields.map((field) => {
+      if (field.variable != name) {
+        arr.push(field);
+      }
+    });
+    let valor;
+    if (value == null) {
+      valor = null;
+    } else {
+      valor = value.value;
+    }
+    setInputCatFields([
+      ...arr,
+      {
+        variable: name,
+        limiteinf: null,
+        limitesup: null,
+        igual: valor,
+        tipo: "C",
+      },
+    ]);
   };
 
   const handleVarAdding = () => {
@@ -49,6 +89,13 @@ const Groupform = () => {
 
   const handleVarDeleting = () => {
     if (selectValue != null) {
+      let arr2 = [];
+      inputCatFields.map((field) => {
+        if (field.variable != selectValue.label) {
+          arr2.push(field);
+        }
+      });
+      setInputCatFields(arr2);
       let index;
       standardVars.map((item) => {
         if (selectValue.value == item.value) {
@@ -68,8 +115,48 @@ const Groupform = () => {
     }
   };
 
-  const showstatus = () => {
-    console.log("estado");
+  const getnumfieldsdata = () => {
+    let arr = [];
+    standardVars.map((item) => {
+      let down;
+      let up;
+      if (item.tipo == "N") {
+        down = parseInt(
+          document.getElementById(`lowerlimit${item.label}`).value
+        );
+        if (down != down) {
+          down = null;
+        }
+
+        up = parseInt(document.getElementById(`upperlimit${item.label}`).value);
+        if (up != up) {
+          up = null;
+        }
+        let jobj = {
+          variable: item.label,
+          limiteinf: down,
+          limitesup: up,
+          igual: null,
+          tipo: "N",
+        };
+        if (up != null || down != null) {
+          arr.push(jobj);
+        }
+      }
+    });
+    inputCatFields.map((field) => {
+      arr.push(field);
+    });
+    let ng = document.getElementById("nombre1").value;
+    if (ng == "") {
+      ng = "grupo sin nombre";
+    }
+    let postbody = {
+      nombregrupo: ng,
+      variables: arr,
+    };
+    console.log(postbody);
+    console.log(arr);
   };
 
   useEffect(() => {}, []);
@@ -105,35 +192,82 @@ const Groupform = () => {
       <form>
         <div className="groupform">
           <div className="innerformcontent">
+            <div className="mb-3">
+              <h5>Nombre del grupo</h5>
+              <input
+                className="form-control"
+                type="text"
+                id="nombre1"
+                aria-describedby="emailHelp"
+              />
+            </div>
             {standardVars.map((vname) => {
               if (vname.tipo == "N") {
                 return (
-                  <FormNumField
-                    key={`${vname.label}input`}
-                    namevar={vname.label}
-                  />
+                  <div className="mb-3" key={vname.label}>
+                    <div>
+                      <h5>{vname.label}</h5>
+                    </div>
+                    <div className="row">
+                      <div className="col-4  namevar">
+                        <p className="align-middle">Desde:</p>
+                      </div>
+                      <div className="col-8 ">
+                        <input
+                          type="number"
+                          id={`lowerlimit${vname.label}`}
+                          className="form-control"
+                          aria-describedby="lowerlimit"
+                        />
+                      </div>
+                      <div className="col-4 ">
+                        <p className="align-middle">Hasta:</p>
+                      </div>
+                      <div className="col-8 ">
+                        <input
+                          type="number"
+                          id={`upperlimit${vname.label}`}
+                          className="form-control"
+                          aria-describedby="upperlimit"
+                        />
+                      </div>
+                    </div>
+                    <hr />
+                  </div>
                 );
               } else {
                 return (
-                  <FormCatField
-                    key={`${vname.label}input`}
-                    namevar={vname.label}
-                  />
+                  <div className="mb-3" key={vname.label}>
+                    <div>
+                      <h5>{vname.label}</h5>
+                    </div>
+                    <Select
+                      isClearable={true}
+                      onChange={(value) => {
+                        handleChangeCat(vname.label, value);
+                      }}
+                      aria-labelledby="aria-label"
+                      inputId="aria-example-input"
+                      name="aria-live-color"
+                      options={colourOptions}
+                    />
+                    <hr />
+                  </div>
                 );
               }
             })}
           </div>
         </div>
-        <button
-          type="submit"
-          className="btn btn-primary"
-          onClick={() => {
-            showstatus();
-          }}
-        >
-          Submit
-        </button>
       </form>
+      <button
+        type=""
+        className="btn btn-primary"
+        onClick={() => {
+          getnumfieldsdata();
+        }}
+      >
+        Submit
+      </button>
       {/*-------------------------------------------------MODAL------------------------------------------------*/}
       {/*-------------------------------------------------MODAL------------------------------------------------*/}
       {/*-------------------------------------------------MODAL------------------------------------------------*/}
