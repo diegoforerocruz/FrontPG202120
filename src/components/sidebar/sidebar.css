@@ -1,0 +1,36 @@
+.sidebarlist {
+  list-style-type: none;
+}
+.buttongrupos {
+  width: 100%;
+}
+
+.sidebarwidth {
+  width: 25%;
+}
+.grouplist {
+  height: 30%;
+  overflow-y: scroll;
+}
+
+.lenghtgrupos {
+  width: 100%;
+}
+
+.groupform {
+  height: 15em;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+.formvar {
+  height: 10em;
+}
+
+.numfieldfont {
+  padding: auto;
+}
+
+.innerformcontent {
+  width: 95%;
+}
