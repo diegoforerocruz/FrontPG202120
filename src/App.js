@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-
+import GroupManage from "./components/groupManage";
 import Intraetapas from "./components/intraetapas";
 import Inicio from "./components/inicio";
 
@@ -33,6 +33,11 @@ function App() {
                     Analisis Intraetapas
                   </Link>
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/groupManage">
+                    Gestión de grupos
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -41,6 +46,7 @@ function App() {
       <Switch>
         <Route exact path="/" component={Inicio} />
         <Route exact path="/intra" component={Intraetapas} />
+        <Route exact path="/groupManage" component={GroupManage} />
       </Switch>
     </Router>
   );

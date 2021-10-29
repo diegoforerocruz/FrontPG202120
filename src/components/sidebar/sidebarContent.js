@@ -1,45 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import "./sidebar.css";
 import GroupsItem from "./groupsItem";
-import * as Icon from "react-bootstrap-icons";
 import Groupform from "./groupform";
+import data from "./fakedatagroups";
 
 function SidebarContent() {
-  const data = [
-    {
-      name: "juan algoalgoalgo",
-      peso: { mayor: null, igual: null, menor: 3000 },
-      talla: { mayor: 100, igual: null, menor: 200 },
-      pc: { mayor: 30, igual: null, menor: null },
-    },
-    {
-      name: "diego",
-      peso: { mayor: null, igual: null, menor: 1000 },
-      talla: { mayor: 100, igual: null, menor: 200 },
-      pc: { mayor: 30, igual: null, menor: null },
-    },
-    {
-      name: "arturo",
-      peso: { mayor: null, igual: null, menor: 2000 },
-      talla: { mayor: 100, igual: null, menor: 200 },
-      pc: { mayor: 30, igual: null, menor: null },
-    },
-    {
-      name: "nicolas",
-      peso: { mayor: null, igual: null, menor: 4000 },
-      talla: { mayor: 100, igual: null, menor: 200 },
-      pc: { mayor: 30, igual: null, menor: null },
-    },
-    {
-      name: "jose",
-      peso: { mayor: null, igual: null, menor: 5000 },
-      talla: { mayor: 100, igual: null, menor: 200 },
-      pc: { mayor: 30, igual: null, menor: null },
-    },
-  ];
-
-  const handleClick = (name) => {
+  const [grupoClicked, setgrupoClicked] = useState(null);
+  const handleClick = (grupo, name) => {
     console.log(`${name} has been clicked`);
+    setgrupoClicked(grupo);
   };
 
   const handleCheck = (name, ischeked) => {
@@ -50,6 +19,7 @@ function SidebarContent() {
     }
   };
 
+  console.log(grupoClicked);
   return (
     <div className="mx-1 my-2 sidebarwidth card">
       <div className="card-body">
@@ -60,10 +30,11 @@ function SidebarContent() {
           {data.map((grupo) => {
             return (
               <GroupsItem
-                name={grupo.name}
-                hClick={handleClick}
-                hCheck={handleCheck}
-                key={grupo.name}
+                name={grupo.nombregrupo}
+                hClick={() => handleClick(grupo, grupo.nombregrupo)}
+                hCheck={() => handleCheck}
+                key={grupo.nombregrupo}
+                groupInfo={grupo}
               />
             );
           })}

@@ -34,3 +34,8 @@
 .innerformcontent {
   width: 95%;
 }
+
+.gestionGrupos {
+  height: 80%;
+  overflow-y: scroll;
+}

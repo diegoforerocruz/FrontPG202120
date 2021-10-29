@@ -17,23 +17,21 @@ const colourOptions = [
 ];
 
 let fullList = [
-  { value: "iq12", label: "IQ 12 meses", tipo: "C" },
-  { value: "iq6", label: "IQ 6 meses", tipo: "C" },
-  { value: "estudios", label: "Estudios", tipo: "C" },
-  { value: "pc", label: "Perimetro Cefalico", tipo: "N" },
+  { value: "IQ12", label: "IQ12", tipo: "C" },
+  { value: "IQ6", label: "IQ6", tipo: "C" },
+  { value: "Estudios", label: "Estudios", tipo: "C" },
+  { value: "PC", label: "PC", tipo: "N" },
 ];
 
 let standardVars = [
-  { value: "peso", label: "Peso", tipo: "N" },
-  { value: "talla", label: "Talla", tipo: "N" },
-
-  { value: "ali", label: "Alimentación", tipo: "C" },
+  { value: "Peso", label: "Peso", tipo: "N" },
+  { value: "Talla", label: "Talla", tipo: "N" },
+  { value: "Ali", label: "Ali", tipo: "C" },
 ];
 
 const Groupform = () => {
   const [selectValue, setSelectValue] = useState(null);
   const [fList, setFList] = useState(fullList);
-
   const [inputCatFields, setInputCatFields] = useState([]);
 
   const handleChange = (value) => {
@@ -65,13 +63,13 @@ const Groupform = () => {
     ]);
   };
 
-  const handleVarAdding = () => {
-    if (selectValue != null) {
+  const handleVarAdding = (pvariable) => {
+    if (pvariable != null) {
       let index;
       fList.map((item) => {
-        if (selectValue.value == item.value) {
-          standardVars.push(selectValue);
-          index = fList.indexOf(selectValue);
+        if (pvariable.value == item.value) {
+          standardVars.push(pvariable);
+          index = fList.indexOf(pvariable);
           setSelectValue(null);
 
           setFList(fullList);
@@ -87,21 +85,21 @@ const Groupform = () => {
     }
   };
 
-  const handleVarDeleting = () => {
-    if (selectValue != null) {
+  const handleVarDeleting = (pvariable) => {
+    if (pvariable != null) {
       let arr2 = [];
       inputCatFields.map((field) => {
-        if (field.variable != selectValue.label) {
+        if (field.variable != pvariable.label) {
           arr2.push(field);
         }
       });
       setInputCatFields(arr2);
       let index;
       standardVars.map((item) => {
-        if (selectValue.value == item.value) {
-          fList.push(selectValue);
+        if (pvariable.value == item.value) {
+          fList.push(pvariable);
 
-          index = standardVars.indexOf(selectValue);
+          index = standardVars.indexOf(pvariable);
           setSelectValue(null);
         }
       });
@@ -312,7 +310,7 @@ const Groupform = () => {
                 data-bs-dismiss="modal"
                 className="btn btn-primary"
                 onClick={() => {
-                  handleVarAdding();
+                  handleVarAdding(selectValue);
                 }}
               >
                 Guardar
@@ -360,7 +358,7 @@ const Groupform = () => {
                 data-bs-dismiss="modal"
                 className="btn btn-primary"
                 onClick={() => {
-                  handleVarDeleting();
+                  handleVarDeleting(selectValue);
                 }}
               >
                 Guardar
