@@ -16,18 +16,19 @@ const colourOptions = [
   { value: "silver", label: "Silver" },
 ];
 
-let fullList = [
+let originalState = [
   { value: "IQ12", label: "IQ12", tipo: "C" },
   { value: "IQ6", label: "IQ6", tipo: "C" },
   { value: "Estudios", label: "Estudios", tipo: "C" },
   { value: "PC", label: "PC", tipo: "N" },
-];
-
-let standardVars = [
   { value: "Peso", label: "Peso", tipo: "N" },
   { value: "Talla", label: "Talla", tipo: "N" },
   { value: "Ali", label: "Ali", tipo: "C" },
 ];
+
+let fullList = [...originalState];
+
+let standardVars = [];
 
 const Groupform = () => {
   const [selectValue, setSelectValue] = useState(null);
@@ -127,9 +128,11 @@ const Groupform = () => {
         }
 
         up = parseInt(document.getElementById(`upperlimit${item.label}`).value);
+
         if (up != up) {
           up = null;
         }
+
         let jobj = {
           variable: item.label,
           limiteinf: down,
@@ -155,6 +158,10 @@ const Groupform = () => {
     };
     console.log(postbody);
     console.log(arr);
+    document.getElementById("nombre1").value = "";
+    fullList = [...originalState];
+    setFList(fullList);
+    standardVars = [];
   };
 
   useEffect(() => {}, []);
