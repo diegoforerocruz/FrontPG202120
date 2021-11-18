@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 const Groupdetail = (props) => {
-  console.log(props.groupInfo);
+  //console.log(props.groupInfo);
   return (
     <div className={props.visibility}>
       <form>

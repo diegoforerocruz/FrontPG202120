@@ -3,46 +3,22 @@ import "./sidebar/sidebar.css";
 import data from "./sidebar/fakedatagroups";
 import Groupdetail from "./groupdetail";
 import Select from "react-select";
+import { enviromentvars, envaroptions } from "../data/enviromentvarsdata";
+import analisisvars from "../data/analisisvarsdata";
 
-const colourOptions = [
-  { value: "ocean", label: "Ocean" },
-  { value: "blue", label: "Blue" },
-  { value: "purple", label: "Purple" },
-  { value: "red", label: "Red" },
-  { value: "orange", label: "Orange" },
-  { value: "yellow", label: "Yellow" },
-  { value: "green", label: "Green" },
-  { value: "forest", label: "Forest" },
-  { value: "slate", label: "Slate" },
-  { value: "silver", label: "Silver" },
-];
-let populationList = [
-  { value: "IQ12", label: "IQ12", tipo: "C" },
-  { value: "IQ6", label: "IQ6", tipo: "C" },
-  { value: "Estudios", label: "Estudios", tipo: "C" },
-  { value: "PC", label: "PC", tipo: "N" },
-  { value: "Peso", label: "Peso", tipo: "N" },
-  { value: "Talla", label: "Talla", tipo: "N" },
-  { value: "Ali", label: "Ali", tipo: "C" },
-];
+let populationList = [...enviromentvars];
 let populationVarList = [...populationList];
 let standardPopulationVarList = [];
-let analisisList = [
-  { value: "IQ12", label: "IQ12", tipo: "C" },
-  { value: "IQ6", label: "IQ6", tipo: "C" },
-  { value: "Estudios", label: "Estudios", tipo: "C" },
-  { value: "PC", label: "PC", tipo: "N" },
-  { value: "Peso", label: "Peso", tipo: "N" },
-  { value: "Talla", label: "Talla", tipo: "N" },
-  { value: "Ali", label: "Ali", tipo: "C" },
-];
+let analisisList = [...analisisvars];
 let analisisVarList = [...analisisList];
 let standardAnalisisVarList = [];
 
 const GroupManage = () => {
+  const [grupos, setGrupos] = useState([]);
   const [grupoClicked, setgrupoClicked] = useState(null);
   const [selectValue, setSelectValue] = useState(null);
   const [inputCatFields, setInputCatFields] = useState([]);
+  const [calculatedCluster, setCalculatedCluster] = useState([]);
 
   const handleChange = (value) => {
     setSelectValue(value);
@@ -68,7 +44,7 @@ const GroupManage = () => {
         limiteinf: null,
         limitesup: null,
         igual: valor,
-        tipo: "C",
+        tipo: 2,
       },
     ]);
   };
@@ -160,12 +136,12 @@ const GroupManage = () => {
     }
   };
 
-  const getnumfieldsdata = () => {
+  const getnumfieldsdata = async () => {
     let arr = [];
     standardPopulationVarList.map((item) => {
       let down;
       let up;
-      if (item.tipo == "N") {
+      if (item.tipo == 1) {
         down = parseInt(
           document.getElementById(`lowerlimit${item.label}`).value
         );
@@ -180,11 +156,11 @@ const GroupManage = () => {
         }
 
         let jobj = {
-          variable: item.label,
+          variable: item.value,
           limiteinf: down,
           limitesup: up,
           igual: null,
-          tipo: "N",
+          tipo: 1,
         };
         if (up != null || down != null) {
           arr.push(jobj);
@@ -203,22 +179,59 @@ const GroupManage = () => {
     if (cNum == "") {
       cNum = "1";
     }
+    let variablesanalisisarr = [];
+    standardAnalisisVarList.map((item) => {
+      variablesanalisisarr.push(item.value);
+    });
     let postbody = {
       nombregrupo: ng,
       variables: arr,
       analisis: {
         clusterNum: parseInt(cNum),
-        variables: standardAnalisisVarList,
+        variables: variablesanalisisarr,
       },
     };
     console.log(postbody);
-    console.log(arr);
     document.getElementById("nombre1").value = "";
     populationVarList = [...populationList];
     standardPopulationVarList = [];
+    setInputCatFields([]);
+    try {
+      const body = postbody;
+      const response = await fetch(
+        "http://localhost:5000/analisis/clusteringGroups",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        }
+      );
+      const jsonData = await response.json();
+
+      setCalculatedCluster([...jsonData]);
+      console.log(calculatedCluster);
+      getGruposCluster();
+    } catch (err) {
+      console.error(err.message);
+    }
   };
 
-  useEffect(() => {}, []);
+  const getGruposCluster = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/analisis/getallclustergroups"
+      );
+      const jsonData = await response.json();
+      console.log(jsonData);
+      setGrupos([...jsonData]);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  useEffect(() => {
+    getGruposCluster();
+  }, []);
   console.log(grupoClicked);
   return (
     <div className="row  mx-1">
@@ -237,9 +250,9 @@ const GroupManage = () => {
             </button>
           </div>
           <div className="gestionGrupos ">
-            {data.map((grupo) => {
+            {grupos.map((grupo) => {
               return (
-                <div className="row my-2 lenghtgrupos" key={grupo.nombregrupo}>
+                <div className="row my-2 lenghtgrupos" key={grupo.nombre}>
                   <div className="col">
                     <button
                       className="btn btn-light buttongrupos"
@@ -247,7 +260,7 @@ const GroupManage = () => {
                         setgrupoClicked(grupo);
                       }}
                     >
-                      {grupo.nombregrupo}
+                      {grupo.nombre}
                     </button>
                   </div>
                 </div>
@@ -303,7 +316,7 @@ const GroupManage = () => {
                   </div>
                   <div>
                     {standardPopulationVarList.map((vname) => {
-                      if (vname.tipo == "N") {
+                      if (vname.tipo == 1) {
                         return (
                           <div className="mb-3" key={vname.label}>
                             <div>
@@ -337,6 +350,9 @@ const GroupManage = () => {
                           </div>
                         );
                       } else {
+                        let temp = envaroptions.find(
+                          (element) => element.nombre == vname.value
+                        );
                         return (
                           <div className="mb-3" key={vname.label}>
                             <div>
@@ -345,12 +361,12 @@ const GroupManage = () => {
                             <Select
                               isClearable={true}
                               onChange={(value) => {
-                                handleChangeCat(vname.label, value);
+                                handleChangeCat(vname.value, value);
                               }}
                               aria-labelledby="aria-label"
                               inputId="aria-example-input"
                               name="aria-live-color"
-                              options={colourOptions}
+                              options={temp.options}
                             />
                             <hr />
                           </div>
@@ -430,6 +446,14 @@ const GroupManage = () => {
                 </button>
               </form>
               <Groupdetail groupInfo={grupoClicked} visibility={"d-none"} />
+
+              <hr />
+
+              {calculatedCluster.map((clusterInfo) => (
+                <p key={`${clusterInfo.etapa}${clusterInfo.labels}`}>
+                  {JSON.stringify(clusterInfo)}
+                </p>
+              ))}
             </div>
           ) : (
             //Detail del grupo
