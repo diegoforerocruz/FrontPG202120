@@ -191,7 +191,7 @@ const GroupManage = () => {
         variables: variablesanalisisarr,
       },
     };
-    console.log(postbody);
+
     document.getElementById("nombre1").value = "";
     populationVarList = [...populationList];
     standardPopulationVarList = [];
@@ -209,7 +209,7 @@ const GroupManage = () => {
       const jsonData = await response.json();
 
       setCalculatedCluster([...jsonData]);
-      console.log(calculatedCluster);
+
       getGruposCluster();
     } catch (err) {
       console.error(err.message);
@@ -222,8 +222,8 @@ const GroupManage = () => {
         "http://localhost:5000/analisis/getallclustergroups"
       );
       const jsonData = await response.json();
-      console.log(jsonData);
-      setGrupos([...jsonData]);
+
+      setGrupos([...jsonData["datos"]]);
     } catch (err) {
       console.error(err.message);
     }
@@ -232,7 +232,6 @@ const GroupManage = () => {
   useEffect(() => {
     getGruposCluster();
   }, []);
-  console.log(grupoClicked);
   return (
     <div className="row  mx-1">
       <div className="mx-1 my-2 sidebarwidth card col-3">
@@ -448,12 +447,6 @@ const GroupManage = () => {
               <Groupdetail groupInfo={grupoClicked} visibility={"d-none"} />
 
               <hr />
-
-              {calculatedCluster.map((clusterInfo) => (
-                <p key={`${clusterInfo.etapa}${clusterInfo.labels}`}>
-                  {JSON.stringify(clusterInfo)}
-                </p>
-              ))}
             </div>
           ) : (
             //Detail del grupo
