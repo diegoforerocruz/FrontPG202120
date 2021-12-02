@@ -8,22 +8,9 @@ import {
   VictoryLegend,
   VictoryScatter,
 } from "victory";
+import Select from "react-select";
 import GroupDetailSidebar from "./groupDetailSidebar";
-
-const yellow200 = "#FFF59D";
-const deepOrange600 = "#F4511E";
-const lime300 = "#DCE775";
-const lightGreen500 = "#8BC34A";
-const teal700 = "#00796B";
-const cyan900 = "#006064";
-const colors = [
-  deepOrange600,
-  yellow200,
-  lime300,
-  lightGreen500,
-  teal700,
-  cyan900,
-];
+import { nacimientoVars } from "../data/nacimientovars";
 
 const Groupdetail = (props) => {
   const [headers, setheaders] = useState(
@@ -42,6 +29,8 @@ const Groupdetail = (props) => {
   const [labelsTG, setlabelsTG] = useState([]);
   const [selectedBar, setselectedBar] = useState(null);
   const [analisisVars, setanalisisVars] = useState("");
+  const [additionalVars, setadditionalVars] = useState([]);
+  const [avtg, setavtg] = useState([]);
 
   const handleBarSelection = (etapa, grupo) => {
     let arr = [props.groupInfo.nombre, etapa, grupo];
@@ -126,6 +115,7 @@ const Groupdetail = (props) => {
       arr.push(defaultArr);
     });
     setdataToGraphlvl2([...arr]);
+    setavtg(backresponse.additional[0]);
   };
 
   const handleGroupHistory = async () => {
@@ -139,10 +129,12 @@ const Groupdetail = (props) => {
           selectedBar[2] +
           "/" +
           analisisVars +
+          "/" +
+          additionalVars.join("-") +
           ""
       );
       const jsonData = await response.json();
-      console.log(jsonData);
+
       formatjsonlevel2(jsonData);
     } catch (err) {
       console.error(err.message);
@@ -266,6 +258,21 @@ const Groupdetail = (props) => {
                 <p className="card-text">Nombre Grupo: {selectedBar[0]}</p>
                 <p className="card-text">Etapa: {selectedBar[1]}</p>
                 <p className="card-text">Grupo de Cluster: {selectedBar[2]}</p>
+                <p className="card-text">*Variables al nacer</p>
+                <Select
+                  isMulti
+                  name="colors"
+                  options={nacimientoVars}
+                  className="basic-multi-select my-2"
+                  classNamePrefix="select"
+                  onChange={(value) => {
+                    let values = [];
+                    value.map((selectItem) => {
+                      values.push(selectItem.value);
+                    });
+                    setadditionalVars([...values]);
+                  }}
+                />
                 <button
                   type="button"
                   className="btn btn-success"
@@ -310,8 +317,6 @@ const Groupdetail = (props) => {
                 colorScale={"qualitative"}
               >
                 {dataToGraphlvl2.map((dtg) => {
-                  console.log(dtg);
-
                   return (
                     <VictoryBar
                       barWidth={8}
@@ -329,7 +334,7 @@ const Groupdetail = (props) => {
           <div className="row">
             {analisisVars.split("--").map((av) => {
               return (
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-6" key={`lvl2${av}`}>
                   Gráfica {av}
                   <VictoryChart
                     theme={VictoryTheme.material}
@@ -347,8 +352,6 @@ const Groupdetail = (props) => {
                       colorScale={"qualitative"}
                     >
                       {dataToGraphlvl2.map((dtg) => {
-                        console.log(dtg);
-
                         return (
                           <VictoryBar
                             barWidth={8}
@@ -364,6 +367,55 @@ const Groupdetail = (props) => {
                 </div>
               );
             })}
+          </div>
+          <div className="row">
+            <h5>Datos al nacer</h5>
+            <div className="row">
+              {additionalVars.map((addv) => {
+                let avl = "";
+                let artg = [];
+
+                nacimientoVars.map((avli) => {
+                  if (avli.value == addv) {
+                    avl = avli.label;
+                  }
+                });
+                Object.entries(avtg).map((entry) => {
+                  if (entry[0].startsWith(addv)) {
+                    if (entry[0].includes("MIN")) {
+                      artg.push({ x: "MIN", y: parseFloat(entry[1]) });
+                    } else if (entry[0].includes("MAX")) {
+                      artg.push({ x: "MAX", y: parseFloat(entry[1]) });
+                    } else {
+                      artg.push({ x: "AVG", y: parseFloat(entry[1]) });
+                    }
+                  }
+                });
+                console.log(avtg);
+
+                console.log(artg);
+
+                return (
+                  <div className="col-12 col-md-4" key={`${addv}`}>
+                    <h5>Gráfica de {avl}</h5>
+                    <VictoryChart
+                      theme={VictoryTheme.material}
+                      domainPadding={{ x: 50, y: 50 }}
+                      height={400}
+                      width={400}
+                    >
+                      <VictoryBar
+                        barRatio={0.8}
+                        style={{
+                          data: { fill: "#c43a31" },
+                        }}
+                        data={artg}
+                      />
+                    </VictoryChart>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       )}

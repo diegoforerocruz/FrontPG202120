@@ -51,7 +51,11 @@ const GroupDetailSidebar = (props) => {
                         <tr>
                           {Object.keys(etapa[0]).map((header) => {
                             if (header != "etapa") {
-                              return <th scope="col">{header}</th>;
+                              return (
+                                <th scope="col" key={`header${header}`}>
+                                  {header}
+                                </th>
+                              );
                             }
                           })}
                         </tr>
@@ -59,10 +63,14 @@ const GroupDetailSidebar = (props) => {
                       <tbody>
                         {etapa.map((element) => {
                           return (
-                            <tr>
+                            <tr key={`row${element.labels}`}>
                               {Object.entries(element).map((entry) => {
                                 if (entry[0] != "etapa") {
-                                  return <td>{entry[1]}</td>;
+                                  return (
+                                    <td key={`${entry[0]}-${entry[1]}`}>
+                                      {entry[1]}
+                                    </td>
+                                  );
                                 }
                               })}
                             </tr>
