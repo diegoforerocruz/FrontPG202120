@@ -1,6 +1,10 @@
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import GroupManage from "./components/groupManage";
+import VariableManage from "./components/variableManage";
+import TemasManage from "./components/TemasManage";
 import Inicio from "./components/inicio";
+import "./assets/index.less";
+
 
 function App() {
   return (
@@ -32,6 +36,16 @@ function App() {
                     Gestión de grupos
                   </Link>
                 </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/variableManage">
+                    Gestión de variables
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/TemasManage">
+                    Gestión temas de interés
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
@@ -40,6 +54,8 @@ function App() {
       <Switch>
         <Route exact path="/" component={Inicio} />
         <Route exact path="/groupManage" component={GroupManage} />
+        <Route exact path="/variableManage" component={VariableManage} />
+        <Route exact path="/TemasManage" component={TemasManage} />
       </Switch>
     </Router>
   );
