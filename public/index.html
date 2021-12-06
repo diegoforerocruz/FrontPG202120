@@ -44,3 +44,492 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
   </body>
 </html>
+
+<!--
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+
+    <title>Tree Example</title>
+
+    <style>
+	
+	.node {
+		cursor: pointer;
+	}
+
+	.rect2 {
+	  fill: #fff;
+	  stroke: steelblue;
+	  stroke-width: 1px;
+	}
+
+	.node text {
+	  font: 12px sans-serif;
+	}
+
+	.link {
+	  fill: none;
+	  stroke: #ccc;
+	  stroke-width: 2px;
+	}
+	
+    </style>
+
+  </head>
+
+  <body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+	
+<script>
+
+var treeData = [
+  {
+    "name": "Top Level",
+    "parent": "null",
+    "percent":60,
+    "children": [
+      {
+        "name": "Level 2: A",
+        "parent": "Top Level",
+        "percent":20,
+        "children": [
+          {
+            "name": "Son of A",
+            "parent": "Level 2: A",
+            "percent":35
+          },
+          {
+            "name": "Daughter of A",
+            "parent": "Level 2: A",
+            "percent":50
+          },
+          {
+            "name": "Daughter of A",
+            "parent": "Level 2: A",
+            "percent":70
+          }
+        ]
+      },
+      {
+        "name": "Level 2: B",
+        "parent": "Top Level",
+        "percent":50,
+        "children": [
+          {
+            "name": "Son of B",
+            "parent": "Level 2: B",
+            "percent":70
+          },
+          {
+            "name": "Daughter of B",
+            "parent": "Level 2: B",
+            "percent":70
+          },
+          {
+            "name": "Daughter of B",
+            "parent": "Level 2: B",
+            "percent":70
+          }
+          ,
+          {
+            "name": "Daughter of B",
+            "parent": "Level 2: B",
+            "percent":70
+          }
+        ]
+      }
+    ]
+  }
+];
+
+
+// ************** Generate the tree diagram	 *****************
+var margin = {top: 20, right: 120, bottom: 20, left: 120},
+	width = 960 - margin.right - margin.left,
+	height = 500 - margin.top - margin.bottom;
+	
+var i = 0,
+	duration = 750,
+	root;
+
+var tree = d3.layout.tree()
+	.size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+	.projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body").append("svg")
+	.attr("width", width + margin.right + margin.left)
+	.attr("height", height + margin.top + margin.bottom)
+  .append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+root = treeData[0];
+root.x0 = height / 2;
+root.y0 = 0;
+  
+update(root);
+
+
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+	  links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+  // Update the nodes…
+  var node = svg.selectAll("g.node")
+	  .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter any new nodes at the parent's previous position.
+  var nodeEnter = node.enter().append("g")
+	  .attr("class", "node")
+	  .attr("transform", function(d) { return "translate(" + source.y0 + "," + source.x0 + ")"; })
+	  .on("click", click);
+
+  nodeEnter.append("rect")
+	  .attr("width", 75).attr("height",25)
+	  .attr('class', 'rect2')
+	  .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+	  
+  nodeEnter.append("rect")
+	  .attr("width", function(d) { return 75*(d._percent/100);})
+	  .attr("height",25)
+	  .style("fill", "#f76");
+
+  nodeEnter.append("text")
+	  .attr("x", function(d) { return d.children || d._children ? 0 : 0; })
+	  .attr("dy", "-0.5em")
+	  .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
+	  .text(function(d) { return d.name; })
+	  .style("fill-opacity", 1e-6);
+
+  // Transition nodes to their new position.
+  var nodeUpdate = node.transition()
+	  .duration(duration)
+	  .attr("transform", function(d) { return "translate(" + (d.y-25) + "," + (d.x-12) + ")"; });
+
+  nodeUpdate.select("rect")
+	  .attr("width", 75).attr("height",25)
+	  .style("fill", function(d) { return d._children ? "lightsteelblue" : "#fff"; });
+
+  nodeUpdate.select("text")
+	  .style("fill-opacity", 1);
+
+  // Transition exiting nodes to the parent's new position.
+  var nodeExit = node.exit().transition()
+	  .duration(duration)
+	  .attr("transform", function(d) { return "translate(" + (source.y-25) + "," + (source.x-12) + ")"; })
+	  .remove();
+
+  nodeExit.select("rect")
+	  .attr("width", 75).attr("height",25);
+
+  nodeExit.select("text")
+	  .style("fill-opacity", 1e-6);
+
+  // Update the links…
+  var link = svg.selectAll("path.link")
+	  .data(links, function(d) { return d.target.id; });
+
+  // Enter any new links at the parent's previous position.
+  link.enter().insert("path", "g")
+	  .attr("class", "link")
+	  .attr("d", function(d) {
+		var o = {x: source.x0, y: source.y0};
+		return diagonal({source: o, target: o});
+	  });
+
+  // Transition links to their new position.
+  link.transition()
+	  .duration(duration)
+	  .attr("d", diagonal);
+
+  // Transition exiting nodes to the parent's new position.
+  link.exit().transition()
+	  .duration(duration)
+	  .attr("d", function(d) {
+		var o = {x: source.x, y: source.y};
+		return diagonal({source: o, target: o});
+	  })
+	  .remove();
+
+  // Stash the old positions for transition.
+  nodes.forEach(function(d) {
+	d.x0 = d.x;
+	d.y0 = d.y;
+  });
+}
+
+// Toggle children on click.
+function click(d) {
+  if (d.children) {
+	d._children = d.children;
+	d.children = null;
+  } else {
+	d.children = d._children;
+	d._children = null;
+  }
+  update(d);
+}
+
+</script>
+	
+  </body>
+</html>
+-->
+
+<!--
+  import React from "react";
+import Search from "../search/Search.js";
+import * as d3 from "d3";
+import { useEffect, useRef, useState } from "react";
+import { getVariables } from "../../services/variablesUtils.js"
+import { getBins } from "../../services/gruposUtils.js"
+
+function Tree() {
+
+  const [state, setState] = useState([]);
+  const [treeData, setTreeData] = useState({});
+  const [root,setRoot]=useState({model:null, data:null});
+  const [d3Init, setD3Init] = useState();
+
+  const cleanRequest = (x) => {
+    let rta = {
+      limiteinf: x.data.limiteinf ? parseInt(x.data.limiteinf):null,
+      limitesup: x.data.limitesup ? parseInt(x.data.limitesup):null,
+      igual: x.data.igual ? parseInt(x.data.igual):null,
+      variable: x.data.variable,
+      tipo: x.data.tipo
+    };
+    return rta;
+  };
+
+  const convertToTree = (x) => {
+    x.children = [];
+    x.hide = false;
+    return x
+  };
+
+  const getVariableParaFiltrar = (variable,tipo,fase) => {
+    if (fase === "fase1"){//no hay condiciones previas
+      getBins(2,variable,tipo,[]).then((res) => {
+        let r = convertToTree(res[0]);
+        setTreeData(r);
+        let r_= d3.hierarchy(r);
+        setRoot({model:r_, data:r});
+        d3Init.update(r_,r_);
+      });
+    }
+    else{//hay condiciones previas
+      let leaves = root.model.leaves();
+      for (let leaf of leaves){
+        let conditions = root.model.path(leaf);
+        conditions = conditions.map( x => {return cleanRequest(x)} );
+        getBins(2,variable,tipo,conditions).then((res) => {
+          let temp = res.map(x => convertToTree(x));
+          leaf.data.children = temp;
+          setTreeData(root.model.data);
+          let r_ = d3.hierarchy(root.model.data);
+          setRoot({model:r_, data:root.model.data});
+          d3Init.update(r_,r_);
+        });
+      }
+    }
+  };
+
+  function groupBy(arr, criteria) {
+        const newObj = arr.reduce(function (acc, currentValue) {
+          if (!acc[currentValue[criteria]]) {
+            acc[currentValue[criteria]] = [];
+          }
+          acc[currentValue[criteria]].push({...currentValue, name: currentValue["nombre_general"]+" "+currentValue["evento"]});
+          return acc;
+        }, {});
+        return newObj;
+  };
+
+  const canvas = useRef();
+
+  useEffect(() => {
+    setD3Init(new init());
+    getVariables().then((res) => {
+      res = res.filter(d => d.etiqueta != null);
+      let r = groupBy(res, "etiqueta");
+      var arr = [];
+      for (var key in r) {
+        if (r.hasOwnProperty(key)) {
+          arr.push( {title: key, values: r[key] } );
+        }
+      }
+      setState(arr);
+    });
+  }, []);
+
+  useEffect(()=>{
+      console.log("useEffect2 corriendo");
+  },[treeData]);
+
+  class init {
+
+    constructor(){
+      var margin = {top: 20, right: 20, bottom: 20, left: 50},
+      width = 1300 - margin.right - margin.left,
+      height = 1060 - margin.top - margin.bottom;
+
+      var svg = d3.select(canvas.current).append("svg")
+      .attr("width", width + margin.right + margin.left)
+      .attr("height", height + margin.top + margin.bottom);
+
+          
+      this.g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      console.log("DDD",d3Init,root.model);
+
+    }
+
+    click(d,root) {
+      /** 
+      if (d.children) {
+        console.log("mete datos");
+        d._children = d.children;
+        d.children = null;
+      } else {
+        console.log("saca datos");
+        d.children = d._children;
+        d._children = null;
+      }
+      */
+      if (d.data.hide === true) {
+        d.data.hide = false;
+      } else {
+        d.data.hide = true;
+      }
+      console.log("SELECCIONADO",root);
+      this.update(d,root);
+    };
+
+    getColor(d){
+      if ( d.parent == null){
+        return "#19c2bf"
+      }
+      else{
+        var str = d.parent.x.toString()+d.parent.y.toString();
+        var hash = 0;
+        for (var i = 0; i < str.length; i++) {
+          hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        var colour = '#';
+        for (var j = 0; j < 3; j++) {
+          var value = (hash >> (j * 8)) & 0xFF;
+          colour += ('00' + value.toString(16)).substr(-2);
+        }
+        return colour;
+      } 
+    }
+
+    update(source,root) {
+
+      let tree = d3.tree().size([900,900]);
+      console.log("PERI",source);
+
+      var treeLink =  d3.linkHorizontal().x(d => 0.5*d.y).y(d => 0.7*d.x);
+
+      let nodes = tree(root);
+      let links = root.links();
+
+      nodes.each(function(d) { d.y = d.depth * 470; });
+
+      this.g.selectAll("path")
+      .data(links)
+      .join(
+            enter => enter.insert("path", "g")
+            .attr("class","link")
+            .attr("d", function(d) {
+                var o = {x: source.data.x0, y: source.data.y0};
+                return treeLink({source: o, target: o});
+            }),
+            exit => exit
+            .transition()
+            .duration(750)
+            .attr("d", function(d) {
+                var o = {x: source.x, y: source.y};
+                return treeLink({source: o, target: o});
+            })
+            .remove()
+          )
+        .transition()
+        .duration(750)
+        .attr("d", treeLink);
+  
+      const nodeU = this.g.selectAll("g")
+      .data(nodes.descendants())
+      .join(
+            enter => {
+              var nodeEnter = enter
+              .append("g")
+              .attr("class", "node")
+              .attr("transform", (d) => "translate(" + (0.5*parseInt(source.data.y0)) + "," + (0.7*parseInt(source.data.x0)) + ")")
+              .on("click", (d,i) => this.click(i,root));
+              nodeEnter.append("rect").attr("width", 70).attr("height",25).attr('class', 'rect0');
+              nodeEnter.append("rect")
+              .attr("width", d => d.data.percentage)
+              .attr("height",25)
+              .attr('class', 'rect')
+              .attr("fill",d => this.getColor(d));
+              nodeEnter.append("rect").attr("width", 70).attr("height",25).attr('class', 'rect2');
+              nodeEnter.append("text")
+              .attr("dy", "-1em")
+              .text(d => label(d));
+              return nodeEnter;
+            } 
+            ,
+            update => update
+            .transition()
+            .duration(750)
+            .attr("transform", (d) => "translate(" + (0.5*parseInt(d.y-25)) + "," + (0.7*parseInt(d.x-12)) + ")"),
+            exit => exit
+            .transition()
+            .duration(750)
+            .attr("transform", (d) => "translate(" + (0.5*parseInt(source.y-25)) + "," + (0.7*parseInt(source.x-12)) + ")")
+            .remove()
+      ).attr("transform", d => `translate(${0.5*parseInt(d.y-40)},${0.7*parseInt(d.x-12)})`);
+  
+      nodeU.each(function(d) {
+        d.data.x0 = d.x;
+        d.data.y0 = d.y;
+      });
+    };
+
+  };
+
+  const label = (d) => {
+      let r="";
+      if (d.data.limiteinf && d.data.limitesup) r=` [ ${d.data.limiteinf} , ${d.data.limitesup} ]`;
+      else if (d.data.limiteinf) r=`${d.data.variable} > ${d.data.limiteinf}`;
+      else if(d.data.limitesup) r=`${d.data.variable} < ${d.data.limitesup}`;
+      else if(d.data.igual) r=`${d.data.igual}`;
+      return r;
+  };
+
+  return (
+  <div>
+    <div className="fases">
+    <Search data={state} getVariableParaFiltrar={getVariableParaFiltrar} fase={"fase1"}/>
+    <Search data={state} getVariableParaFiltrar={getVariableParaFiltrar} fase={"fase2"}/>
+    <Search data={state} getVariableParaFiltrar={getVariableParaFiltrar} fase={"fase3"}/>
+    <Search data={state} getVariableParaFiltrar={getVariableParaFiltrar} fase={"fase4"}/>
+    </div>
+    <div ref={canvas}></div>
+  </div>
+  );
+}
+
+export default Tree;
+-->
