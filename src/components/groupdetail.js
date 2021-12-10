@@ -29,7 +29,9 @@ const Groupdetail = (props) => {
   const [labelsTG, setlabelsTG] = useState([]);
   const [selectedBar, setselectedBar] = useState(null);
   const [analisisVars, setanalisisVars] = useState("");
-  const [additionalVars, setadditionalVars] = useState([]);
+  const [additionalVars, setadditionalVars] = useState([
+    nacimientoVars[1].value,
+  ]);
   const [avtg, setavtg] = useState([]);
 
   const handleBarSelection = (etapa, grupo) => {
@@ -175,12 +177,12 @@ const Groupdetail = (props) => {
         </div>
       )}
       <div className="row">
-        <div className="col-12 col-md-8">
+        <div className="col-12 col-md-7">
           <VictoryChart
             theme={VictoryTheme.material}
             domainPadding={{ x: 50, y: 50 }}
             height={400}
-            width={400}
+            width={500}
           >
             <VictoryAxis style={{ tickLabels: { angle: -60 } }} />
             <VictoryAxis dependentAxis theme={VictoryTheme.material} />
@@ -236,7 +238,7 @@ const Groupdetail = (props) => {
             </VictoryGroup>
           </VictoryChart>
         </div>
-        <div className="col-12 col-md-4 my-3">
+        <div className="col-12 col-md-5 my-3">
           {selectedBar == null ? (
             <div className="card">
               <div className="card-body">
@@ -255,14 +257,21 @@ const Groupdetail = (props) => {
                 <h5 className="card-title">Barra Seleccionada</h5>
                 <hr />
 
-                <p className="card-text">Nombre Grupo: {selectedBar[0]}</p>
-                <p className="card-text">Etapa: {selectedBar[1]}</p>
-                <p className="card-text">Grupo de Cluster: {selectedBar[2]}</p>
+                <p className="card-text">
+                  <b>Nombre Grupo:</b> {selectedBar[0]}
+                </p>
+                <p className="card-text">
+                  <b>Etapa:</b> {selectedBar[1]}
+                </p>
+                <p className="card-text">
+                  <b>Grupo de Cluster:</b> {selectedBar[2]}
+                </p>
                 <p className="card-text">*Variables al nacer</p>
                 <Select
                   isMulti
                   name="colors"
                   options={nacimientoVars}
+                  defaultValue={[nacimientoVars[1]]}
                   className="basic-multi-select my-2"
                   classNamePrefix="select"
                   onChange={(value) => {
@@ -290,131 +299,208 @@ const Groupdetail = (props) => {
         <div></div>
       ) : (
         <div className="row">
-          <div className="col-12 col-md-6">
-            <VictoryChart
-              theme={VictoryTheme.material}
-              domainPadding={{ x: 50, y: 50 }}
-              height={400}
-              width={400}
-            >
-              <VictoryAxis style={{ tickLabels: { angle: -60 } }} />
-              <VictoryAxis dependentAxis theme={VictoryTheme.material} />
-              <VictoryLegend
-                x={125}
-                y={10}
-                title="Clusters"
-                centerTitle
-                orientation="horizontal"
-                gutter={20}
-                style={{ border: { stroke: "black" } }}
-                colorScale={"qualitative"}
-                data={labelsTG}
-              />
-              <VictoryGroup
-                horizontal
-                offset={10}
-                style={{ data: { width: 8 } }}
-                colorScale={"qualitative"}
+          <div className="accordion col-12" id="accordionPanelsStayOpenlvl2">
+            <div className="accordion-item">
+              <h2
+                className="accordion-header"
+                id="panelsStayOpen-headingHystory"
               >
-                {dataToGraphlvl2.map((dtg) => {
-                  return (
-                    <VictoryBar
-                      barWidth={8}
-                      key={`lvl2dataof${dtg.count}`}
-                      data={dtg}
-                      x="etapa"
-                      y="count"
-                      labels={({ datum }) => `${datum.count}`}
-                    />
-                  );
-                })}
-              </VictoryGroup>
-            </VictoryChart>
-          </div>
-          <div className="row">
-            {analisisVars.split("--").map((av) => {
-              return (
-                <div className="col-12 col-md-6" key={`lvl2${av}`}>
-                  Gráfica {av}
-                  <VictoryChart
-                    theme={VictoryTheme.material}
-                    domainPadding={{ x: 50, y: 50 }}
-                    height={400}
-                    width={400}
-                  >
-                    <VictoryAxis style={{ tickLabels: { angle: -60 } }} />
-                    <VictoryAxis dependentAxis theme={VictoryTheme.material} />
-
-                    <VictoryGroup
-                      horizontal
-                      offset={10}
-                      style={{ data: { width: 8 } }}
-                      colorScale={"qualitative"}
-                    >
-                      {dataToGraphlvl2.map((dtg) => {
-                        return (
-                          <VictoryBar
-                            barWidth={8}
-                            key={`lvl2dataof${dtg.count}`}
-                            data={dtg}
-                            x="etapa"
-                            y={av}
-                          />
-                        );
-                      })}
-                    </VictoryGroup>
-                  </VictoryChart>
-                </div>
-              );
-            })}
-          </div>
-          <div className="row">
-            <h5>Datos al nacer</h5>
-            <div className="row">
-              {additionalVars.map((addv) => {
-                let avl = "";
-                let artg = [];
-
-                nacimientoVars.map((avli) => {
-                  if (avli.value == addv) {
-                    avl = avli.label;
-                  }
-                });
-                Object.entries(avtg).map((entry) => {
-                  if (entry[0].startsWith(addv)) {
-                    if (entry[0].includes("MIN")) {
-                      artg.push({ x: "MIN", y: parseFloat(entry[1]) });
-                    } else if (entry[0].includes("MAX")) {
-                      artg.push({ x: "MAX", y: parseFloat(entry[1]) });
-                    } else {
-                      artg.push({ x: "AVG", y: parseFloat(entry[1]) });
-                    }
-                  }
-                });
-                console.log(avtg);
-
-                console.log(artg);
-
-                return (
-                  <div className="col-12 col-md-4" key={`${addv}`}>
-                    <h5>Gráfica de {avl}</h5>
+                <button
+                  className="accordion-button"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#panelsStayOpen-collapseOne"
+                  aria-expanded="true"
+                  aria-controls="panelsStayOpen-collapseOne"
+                >
+                  Histórico
+                </button>
+              </h2>
+              <div
+                id="panelsStayOpen-collapseOne"
+                className="accordion-collapse collapse show"
+                aria-labelledby="panelsStayOpen-headingOne"
+              >
+                <div className="accordion-body row">
+                  <div className="col-12 col-md-6">
                     <VictoryChart
                       theme={VictoryTheme.material}
                       domainPadding={{ x: 50, y: 50 }}
                       height={400}
                       width={400}
                     >
-                      <VictoryBar
-                        barRatio={0.8}
-                        style={{
-                          data: { fill: "#c43a31" },
-                        }}
-                        data={artg}
+                      <VictoryAxis style={{ tickLabels: { angle: -60 } }} />
+                      <VictoryAxis
+                        dependentAxis
+                        theme={VictoryTheme.material}
                       />
+                      <VictoryLegend
+                        x={125}
+                        y={10}
+                        title="Clusters"
+                        centerTitle
+                        orientation="horizontal"
+                        gutter={20}
+                        style={{ border: { stroke: "black" } }}
+                        colorScale={"qualitative"}
+                        data={labelsTG}
+                      />
+                      <VictoryGroup
+                        horizontal
+                        offset={10}
+                        style={{ data: { width: 8 } }}
+                        colorScale={"qualitative"}
+                      >
+                        {dataToGraphlvl2.map((dtg) => {
+                          return (
+                            <VictoryBar
+                              barWidth={8}
+                              key={`lvl2dataof${dtg.count}`}
+                              data={dtg}
+                              x="etapa"
+                              y="count"
+                              labels={({ datum }) => `${datum.count}`}
+                            />
+                          );
+                        })}
+                      </VictoryGroup>
                     </VictoryChart>
                   </div>
-                );
-              })}
+                </div>
+              </div>
+            </div>
+            <div className="accordion-item">
+              <h2 className="accordion-header" id="panelsStayOpen-headingVars">
+                <button
+                  className="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#panelsStayOpen-collapseTwo"
+                  aria-expanded="false"
+                  aria-controls="panelsStayOpen-collapseTwo"
+                >
+                  Variables de Analisis
+                </button>
+              </h2>
+              <div
+                id="panelsStayOpen-collapseTwo"
+                className="accordion-collapse collapse"
+                aria-labelledby="panelsStayOpen-headingTwo"
+              >
+                <div className="accordion-body">
+                  <div className="row">
+                    {analisisVars.split("--").map((av) => {
+                      return (
+                        <div className="col-12 col-md-6" key={`lvl2${av}`}>
+                          Gráfica {av}
+                          <VictoryChart
+                            theme={VictoryTheme.material}
+                            domainPadding={{ x: 50, y: 50 }}
+                            height={400}
+                            width={400}
+                          >
+                            <VictoryAxis
+                              style={{ tickLabels: { angle: -60 } }}
+                            />
+                            <VictoryAxis
+                              dependentAxis
+                              theme={VictoryTheme.material}
+                              fixLabelOverlap={true}
+                              tickCount={4}
+                            />
+
+                            <VictoryGroup
+                              horizontal
+                              offset={10}
+                              style={{ data: { width: 8 } }}
+                              colorScale={"qualitative"}
+                            >
+                              {dataToGraphlvl2.map((dtg) => {
+                                return (
+                                  <VictoryBar
+                                    barWidth={8}
+                                    key={`lvl2dataof${dtg.count}`}
+                                    data={dtg}
+                                    x="etapa"
+                                    y={av}
+                                  />
+                                );
+                              })}
+                            </VictoryGroup>
+                          </VictoryChart>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="accordion-item">
+              <h2
+                className="accordion-header"
+                id="panelsStayOpen-headingNacimiento"
+              >
+                <button
+                  className="accordion-button collapsed"
+                  type="button"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#panelsStayOpen-collapseThree"
+                  aria-expanded="false"
+                  aria-controls="panelsStayOpen-collapseThree"
+                >
+                  Variables de Nacimiento
+                </button>
+              </h2>
+              <div
+                id="panelsStayOpen-collapseThree"
+                className="accordion-collapse collapse"
+                aria-labelledby="panelsStayOpen-headingThree"
+              >
+                <div className="accordion-body">
+                  <div className="row">
+                    {additionalVars.map((addv) => {
+                      let avl = "";
+                      let artg = [];
+
+                      nacimientoVars.map((avli) => {
+                        if (avli.value == addv) {
+                          avl = avli.label;
+                        }
+                      });
+                      Object.entries(avtg).map((entry) => {
+                        if (entry[0].startsWith(addv)) {
+                          if (entry[0].includes("MIN")) {
+                            artg.push({ x: "MIN", y: parseFloat(entry[1]) });
+                          } else if (entry[0].includes("MAX")) {
+                            artg.push({ x: "MAX", y: parseFloat(entry[1]) });
+                          } else {
+                            artg.push({ x: "AVG", y: parseFloat(entry[1]) });
+                          }
+                        }
+                      });
+                      return (
+                        <div className="col-12 col-md-4" key={`${addv}`}>
+                          <h5>Gráfica de {avl}</h5>
+                          <VictoryChart
+                            theme={VictoryTheme.material}
+                            domainPadding={{ x: 50, y: 50 }}
+                            height={400}
+                            width={400}
+                          >
+                            <VictoryBar
+                              barRatio={0.8}
+                              style={{
+                                data: { fill: "#c43a31" },
+                              }}
+                              data={artg}
+                            />
+                          </VictoryChart>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
