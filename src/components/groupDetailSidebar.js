@@ -91,10 +91,10 @@ const GroupDetailSidebar = (props) => {
       pullRight={true}
     >
       <div className="row mx-2 my-4">
-        <div className="col-8 align-self-start">
+        <div className="col-10 align-self-start">
           <h3>Analisis Grupo {props.groupInfo.nombre}</h3>
         </div>
-        <div className=" col-4 float-right">
+        <div className=" col-2 float-right">
           <button
             type="button"
             className="btn btn-primary"

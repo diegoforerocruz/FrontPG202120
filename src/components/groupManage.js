@@ -192,7 +192,6 @@ const GroupManage = () => {
       },
     };
 
-    document.getElementById("nombre1").value = "";
     populationVarList = [...populationList];
     standardPopulationVarList = [];
     setInputCatFields([]);
@@ -211,6 +210,7 @@ const GroupManage = () => {
       setCalculatedCluster([...jsonData]);
 
       getGruposCluster();
+      alert("Grupo creado: revise la lista de grupos");
     } catch (err) {
       console.error(err.message);
     }
@@ -234,7 +234,7 @@ const GroupManage = () => {
   }, []);
   return (
     <div className="row  mx-1">
-      <div className="mx-1 my-2 sidebarwidth card col-3">
+      <div className="px-1 my-2 sidebarwidth card col-3">
         <div className="card-body">
           <div className="row my-2 ">
             <h3 className="col-8">Grupos</h3>
@@ -268,7 +268,7 @@ const GroupManage = () => {
           </div>
         </div>
       </div>
-      <div className="col-8 card mx-1 my-2 ">
+      <div className="col-9 card px-1 my-2 ">
         <div className="card-body">
           {grupoClicked == null ? (
             //Crear grupo
