@@ -1,11 +1,23 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./sidebar.css";
 import GroupsItem from "./groupsItem";
 import Groupform from "./groupform";
 import data from "./fakedatagroups";
+import {getGrupos, getGruposCluster} from "../../services/gruposUtils.js";
 
-function SidebarContent() {
+const SidebarContent = (props) => {
   const [grupoClicked, setgrupoClicked] = useState(null);
+  const [grupos,setGrupos] = useState({grupos:[],grupos_cluster:[]});
+
+  useEffect(() => {
+    getGrupos().then((res) => {
+      setGrupos(s => ({...s, grupos: res}));
+    });
+    getGruposCluster().then((res) => {
+      setGrupos(s => ({...s, grupos_cluster: res}));
+    });
+  }, []);
+
   const handleClick = (grupo, name) => {
     console.log(`${name} has been clicked`);
     setgrupoClicked(grupo);
@@ -19,7 +31,6 @@ function SidebarContent() {
     }
   };
 
-  console.log(grupoClicked);
   return (
     <div className="mx-1 my-2 sidebarwidth card">
       <div className="card-body">
@@ -27,19 +38,37 @@ function SidebarContent() {
           <h3 className="col-8">Grupos</h3>
         </div>
         <div className="grouplist ">
-          {data.map((grupo) => {
+          <p className="subtitleSidebar">Grupos creados manualmente</p>
+          {grupos.grupos.map((grupo) => {
             return (
               <GroupsItem
-                name={grupo.nombregrupo}
-                hClick={() => handleClick(grupo, grupo.nombregrupo)}
+                groupsCluster={props.groupsCluster}
+                setGroupsCluster={props.setGroupsCluster}
+                name={grupo.nombre}
+                id={grupo.id}
+                hClick={() => handleClick(grupo, grupo.nombre)}
                 hCheck={() => handleCheck}
-                key={grupo.nombregrupo}
+                key={grupo.nombre}
+                groupInfo={grupo}
+              />
+            );
+          })}
+          <p className="subtitleSidebar">Grupos creados con clusters</p>
+          {grupos.grupos_cluster.map((grupo) => {
+            return (
+              <GroupsItem
+                groupsCluster={props.groupsCluster}
+                setGroupsCluster={props.setGroupsCluster}
+                name={grupo.nombre}
+                id={grupo.id}
+                hClick={() => handleClick(grupo, grupo.nombre)}
+                hCheck={() => handleCheck}
+                key={grupo.nombre}
                 groupInfo={grupo}
               />
             );
           })}
         </div>
-
         <hr />
         <Groupform />
       </div>

@@ -39,12 +39,12 @@ const ConditionPanelCrearGrupo = (props) => {
 
     const getSliders = (limiteinf, limitesup, igual) => {
         if(igual || (limitesup && limiteinf)){
-            return (<Col sm={8}>
+            return (<Col sm={7}>
                     <Row>
                         <Range allowCross={false}
                         value={[igual?igual:limiteinf, igual?igual:limitesup]}
-                        min={0}
-                        max={500}
+                        min={igual?igual-100:limitesup-100}
+                        max={igual?igual+50:limitesup+50}
                         disabled={false}
                         step={5}
                         onChange={()=>{}}
@@ -92,7 +92,16 @@ const ConditionPanelCrearGrupo = (props) => {
 
     const getInputText = (nombre,valor) => {
         if(valor === null || valor === undefined) valor = "N/A";
-        let p = valor.toString().split(";");
+        let p = valor.toString().split("|");
+        if(props.significados){
+            p = p.map((x)=>{
+                let found = props.significados.filter((d)=>(parseInt(d.valor_db) === parseInt(x)))[0];
+                if(found){
+                    return found.valor_traducido;
+                }
+                else return x;
+            });
+        }
         let p2 = p.map(x =>transformToSelect(x));
         return (
         <Form>
@@ -100,7 +109,7 @@ const ConditionPanelCrearGrupo = (props) => {
                 <Form.Label column sm={4}>
                 {nombre}
                 </Form.Label>
-                <Col sm={8}>
+                <Col sm={7}>
                 {getSelect(p2,p2)}
                 </Col>
             </Form.Group>
@@ -114,8 +123,14 @@ const ConditionPanelCrearGrupo = (props) => {
             {condiciones.map(c => {return <div>
                 {c.tipo === 1?
                 <div>
-                    <p>{c.variable}</p>
-                    {getSliders(c.limiteinf,c.limitesup,c.igual)}
+                    <Form>
+                        <Form.Group as={Row} className="mb-3" controlId="formHorizontalUnidad">
+                            <Form.Label column md={4}>
+                            {c.variable}
+                            </Form.Label>
+                            {getSliders(c.limiteinf,c.limitesup,c.igual)}
+                        </Form.Group>
+                    </Form>
                 </div>:null}
                 {c.tipo === 2?getInputText(c.variable,c.igual):null}
             </div>})}

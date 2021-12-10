@@ -12,7 +12,8 @@ const CreateGroupTree = (props) => {
     const handleSubmit = (values) => {
       let request = {
                 nombregrupo: values.nombre,
-                variables: props.data
+                variables: props.data,
+                datasource: props.datasource
               };
       createGroup(request).then((res)=>{
         console.log("SUBMIT", res);
@@ -38,7 +39,14 @@ const CreateGroupTree = (props) => {
                 <Container>
                   <Row>
                     <Col md={7}>
-                      <ConditionPanelCrearGrupo data={props.data}/> 
+                      <Row>
+                        <h5>Información del grupo:</h5>
+                        <p>Conteo: {props.estadisticas.conteo}</p>
+                        <p>Porcentaje: {parseFloat(props.estadisticas.percentage).toFixed(2)}%</p>
+                      </Row>
+                      <Row>
+                        <ConditionPanelCrearGrupo data={props.data} significados={props.significados}/> 
+                      </Row>
                     </Col>
                     <Col md={5}>
                       <Form.Group as={Row} className="mb-3" controlId="formGridState">
