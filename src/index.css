@@ -34,6 +34,24 @@ body {
   font-size:20px;
 }
 
+.subtitleSidebar{
+  font-size:13px;
+  color:gray;
+}
+
+.fase0exists{
+  margin-left:210px;
+}
+
+.marginLeftTitle{
+  margin-left:40px;
+}
+
+
+.fase0{
+  width:200px;
+}
+
 .settingsAdd{
   background-color: transparent;
   border: none;

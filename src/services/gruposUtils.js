@@ -1,10 +1,23 @@
 const API_URL = "http://localhost:5000/grupos";
 const ALL_URL = `${API_URL}/all`;
+const CLUSTERALL_URL = `${API_URL}/clusterall`;
 const CREATE_URL = `${API_URL}/create`;
-const BINS_URL = (bins,variable,tipo) => `${API_URL}/nivel/${bins}/${variable}/${tipo}`;
+const BINS_URL = (bins,variable,tipo,grupoescogido) => `${API_URL}/nivel/${bins}/${variable}/${tipo}/${grupoescogido}`;
 
-export const getBins = async (bins,variable,tipo,conditions) => {
-  return fetch(BINS_URL(bins,variable,tipo), {
+export const getGruposCluster = async () => {
+  return fetch(CLUSTERALL_URL).then((res) => {
+    return res.json();
+  });
+};
+
+export const getGrupos = async () => {
+  return fetch(ALL_URL).then((res) => {
+    return res.json();
+  });
+};
+
+export const getBins = async (bins,variable,tipo,conditions,grupoescogido) => {
+  return fetch(BINS_URL(bins,variable,tipo,grupoescogido), {
     method: "POST",
     headers: { 
       "Content-Type": "application/json"

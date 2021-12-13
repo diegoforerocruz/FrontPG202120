@@ -8,6 +8,10 @@ class TreeClass{
         return this.root;
     };
 
+    getTipo(){
+        return this.root.tipo_arbol;
+    };
+
     //encuentra el primer nodo que cumpla la condición
     findChildren(node, condition, action){
         if (condition(node)){
@@ -26,14 +30,23 @@ class TreeClass{
         }
     }
 
+    addChildren(node,children){
+        console.log("addChildren",node,children);
+        this.findChildren(this.root,(d)=>{return d.uid===node.uid} ,(n)=>{
+            n.children = children;
+        });
+    }
+
     hideChildren(node){
         this.findChildren(this.root, (d)=>{return d.uid===node.uid}, (n) =>{
             if(n.children){
+                n.oculto = true;
                 let temp = n.children;
                 n._children = temp;
                 n.children = null;                
             }
             else{
+                n.oculto =false;
                 let temp = n._children;
                 n.children = temp;
                 n._children = null;

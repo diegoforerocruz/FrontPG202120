@@ -12,13 +12,13 @@ const FaseSettingsModal = (props) => {
 
     const Range = createSliderWithTooltip(Slider.Range);
 
-      const [numBins,setNumBins] =  useState(props.fase.bins);
+      const [numBins,setNumBins] =  useState(2);
       const [listaOpciones, setListaOpciones] = useState([]);
-      const [minmax, setMinMax] = useState({min:null,max:null});
       const [estructuraGrupos,setEstructuraGrupos] = useState([]);
+      const [tipoDivision, setTipoDivision] = useState({});
 
       const transformToSelect = (x) =>{
-          return { value: x, label: x };
+          return { value: x.valor_db , label: x.valor_traducido };
       };
 
       const changeSelect = (i,x) => {
@@ -27,7 +27,9 @@ const FaseSettingsModal = (props) => {
         let key = info[1]
         let newArr = Object.assign([],estructuraGrupos);
         if(key === "igual"){
-          newArr[index].igual = i.map(y => {return y.value});
+          newArr[index].igual = i.map(y => {return (y.value).toString()}).join("|");
+          newArr[index].limiteinf = null;
+          newArr[index].limitesup = null;
         }
         setEstructuraGrupos(newArr);
       };
@@ -41,15 +43,17 @@ const FaseSettingsModal = (props) => {
               newArr[i].limiteinf = null;
               newArr[i].limitesup = null;
             }
-            if(estructuraGrupos.length > 0){
-              newArr[i].tipodivision="nondefault";
+            if(tipoDivision !== "default"){
+              newArr[i].tipodivision=tipoDivision;
               newArr[i].estructura_grupo=estructuraGrupos;
             }
             newArr[i].bins = values.numero_bins;
           }
+          break;
         }
         props.setFases(newArr);
         props.buildArbol(props.fase.fase);
+        props.setShow(s=> ({...s,show:false}));
       };
 
       const changeRange = (x,i) => {
@@ -57,17 +61,17 @@ const FaseSettingsModal = (props) => {
         newArr[i].limiteinf = x[0];
         newArr[i].limitesup = x[1];
         setEstructuraGrupos(newArr);
-        console.log("CHANGE RANGE",newArr);
       };
+
 
       useEffect(() => {
           //aquí se busca la lista de opciones de la variable escogida, se devuelve error si no se ha escogido la variable
-          
-          let min = 0;
-          let max = 600;
+          setTipoDivision(props.fase.tipodivision);
+          let min = props.fase.min;
+          let max = props.fase.max;
           let newArr = Object.assign([],estructuraGrupos);
-          let ltemp =  props.fase.tipo === 2 ? ["anormal","normal","transitorio"]: [];
-          let chosen = ltemp.length >0 ? []: null;
+          let ltemp =  props.fase.tipo === 2 ? props.fase.significados: [];
+          let chosen = ltemp.length > 0 ? []: null;
           let limit = numBins? numBins : props.fase.bins;
           let resta = parseInt(limit) - newArr.length; //si es positivo hay que agregar items al array, en caso contrario, se quitan
           if(resta>0){
@@ -86,8 +90,8 @@ const FaseSettingsModal = (props) => {
           }
           setEstructuraGrupos(newArr);
           setListaOpciones(ltemp.map(x=>transformToSelect(x)));
-          setMinMax({min:min,max:max});
-      }, [props.fase.bins, numBins]);
+          //setMinMax({min:min,max:max});
+      }, [props, numBins]);
 
     const handleSubmit = (values,i,o) => {};
 
@@ -118,19 +122,49 @@ const FaseSettingsModal = (props) => {
         <>
           <Modal show={props.show} onHide={handleClose} size="lg">
             <Modal.Header closeButton>
-              <Modal.Title>Editar nivel {props.fase.fase}</Modal.Title>
+              <Modal.Title>Editar nivel</Modal.Title>
             </Modal.Header>
             <Formik
                 onSubmit={handleSubmit}
                 initialValues={{
                 numero_bins: 2,
-                tipodivision: false,
                 estructura_grupos: [],
                 }}
               >
               {({ handleSubmit, handleChange, values, errors, setFieldValue }) => (
                 <Form noValidate onSubmit={handleSubmit}>
                   <Modal.Body>
+                      <Form.Group as={Row} className="mb-3" controlId="formHorizontal">
+                          <Form.Label column sm={4}>
+                            ¿cómo desea manejar las divisiones?
+                          </Form.Label>
+                          <Col sm={8}>
+                            <Form.Check
+                            type="radio"
+                            label="Por defecto"
+                            name="tipodivision"
+                            id="formHorizontalRadios1"
+                            value={tipoDivision ==="default"}
+                            onChange={(d)=>{
+                              if(d.target.checked===true){
+                                setTipoDivision("default");
+                              }
+                            }}
+                            />
+                            <Form.Check
+                            type="radio"
+                            label="Especificar los rangos"
+                            name="tipodivision"
+                            id="formHorizontalRadios2"
+                            value={tipoDivision !== "default"}
+                            onChange={(d)=>{
+                              if(d.target.checked===true){
+                                setTipoDivision("nodefault");
+                              }
+                            }}
+                            />
+                          </Col>
+                      </Form.Group>
                       <Form.Group as={Row} className="mb-3" controlId="formHorizontal">
                           <Form.Label column sm={4}>
                             Número de divisiones
@@ -149,31 +183,8 @@ const FaseSettingsModal = (props) => {
                             />
                           </Col>
                       </Form.Group>
-                      <Form.Group as={Row} className="mb-3" controlId="formHorizontal">
-                          <Form.Label column sm={4}>
-                            ¿cómo desea manejar las divisiones?
-                          </Form.Label>
-                          <Col sm={8}>
-                            <Form.Check
-                            type="radio"
-                            label="Por defecto"
-                            name="tipodivision"
-                            id="formHorizontalRadios1"
-                            value={values.tipodivision}
-                            onChange={handleChange}
-                            />
-                            <Form.Check
-                            type="radio"
-                            label="Especificar los rangos"
-                            name="tipodivision"
-                            id="formHorizontalRadios2"
-                            value={values.tipodivision}
-                            onChange={handleChange}
-                            />
-                          </Col>
-                      </Form.Group>
                       <Form.Group>
-                        {values.tipodivision?
+                        {tipoDivision !== "default"?
                           <div>
                           {props.fase.tipo === 2?
                           estructuraGrupos.map((x,index)=>{
@@ -205,8 +216,8 @@ const FaseSettingsModal = (props) => {
                                   <Row>
                                     <Range allowCross={false}
                                     defaultValue={[x.limiteinf, x.limitesup]}
-                                    min={minmax.min}
-                                    max={minmax.max}
+                                    min={props.fase.min}
+                                    max={props.fase.max}
                                     disabled={false}
                                     step={5}
                                     onChange={()=>{}}

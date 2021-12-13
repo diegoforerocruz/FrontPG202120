@@ -33,6 +33,10 @@ const VariablesList = (props) => {
     },[]);
     
     return(
+        <div className="marginLeftTitle">
+        <br/><br/>
+        <h3>Lista de variables</h3>
+        <br/><br/>
         <Container fluid>
             <Row>
                 <Col md={8}>
@@ -85,6 +89,7 @@ const VariablesList = (props) => {
                 <Col md={4}></Col>
             </Row>
         </Container>
+        </div>
     );
 };
 

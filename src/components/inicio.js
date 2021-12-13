@@ -9,7 +9,7 @@ import { getVariables } from "../services/variablesUtils.js";
 const Inicio = () => {
 
   const [state,setState] = useState({data_real:[], variables:[], etapas: ["parto y post-parto","entorno","nacimiento","salida hospitalización","entrada Programa canguro","semana 40","mes 3","mes 6","mes 9","mes 12","entrada posición canguro","salida posición canguro"]});
-
+  const [groupsCluster, setGroupsCluster] = useState([]);
   function groupBy(arr, criteria) {
     const newObj = arr.reduce(function (acc, currentValue) {
       if (!acc[currentValue[criteria]]) {
@@ -44,9 +44,9 @@ const Inicio = () => {
 
   return (
     <div className="row mx-1">
-      <SidebarContent className="col" />
+      <SidebarContent className="col" setGroupsCluster={setGroupsCluster} groupsCluster={groupsCluster}/>
       <div className="col-8">
-        <Tree variables={state.variables.map(x => transformToSelect(x))} etapas={state.etapas.map(x => transformToSelectEtapas(x))} data_real={state.data_real}/>
+        <Tree groupsCluster={groupsCluster} variables={state.variables.map(x => transformToSelect(x))} etapas={state.etapas.map(x => transformToSelectEtapas(x))} data_real={state.data_real}/>
       </div>
     </div>
   );
