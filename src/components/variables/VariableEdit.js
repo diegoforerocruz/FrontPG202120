@@ -78,7 +78,7 @@ const VariableEdit = (props) => {
             significados:significados
         }
         updateVariable(props.item.nombre_real,dir).then((res)=>{
-            console.log("ACTUALIZADO",res);
+            props.unSelectItem(res);
         });
     };
 

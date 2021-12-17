@@ -18,9 +18,19 @@ const GroupsItem = (props) => {
     <div className="row my-2 lenghtgrupos" key={props.name}>
       <div className="col-12 fases">
         <button
-          className="btn btn-light buttongrupos"
+          className={props.grupoClicked? ( props.grupoClicked.nombre === props.name ? "btn btn-primary buttongrupos":"btn btn-light buttongrupos"):"btn btn-light buttongrupos"}
           onClick={() => {
-            props.hClick(props.name);
+              if(props.grupoClicked){
+                if(props.grupoClicked.nombre === props.name){
+                  props.handleClick({nombre:""});
+                }
+                else{
+                  props.handleClick(props.groupInfo);
+                }
+              }
+              else{
+                props.handleClick({nombre:""});
+              }
           }}
         >
           {props.name}

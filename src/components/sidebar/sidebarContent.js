@@ -6,7 +6,7 @@ import data from "./fakedatagroups";
 import {getGrupos, getGruposCluster} from "../../services/gruposUtils.js";
 
 const SidebarContent = (props) => {
-  const [grupoClicked, setgrupoClicked] = useState(null);
+  const [grupoClicked, setgrupoClicked] = useState({nombre:""});
   const [grupos,setGrupos] = useState({grupos:[],grupos_cluster:[]});
 
   useEffect(() => {
@@ -18,16 +18,14 @@ const SidebarContent = (props) => {
     });
   }, []);
 
-  const handleClick = (grupo, name) => {
-    console.log(`${name} has been clicked`);
-    setgrupoClicked(grupo);
-  };
-
-  const handleCheck = (name, ischeked) => {
-    if (ischeked == 1) {
-      console.log(`${name} has been cliked and is checked`);
-    } else {
-      console.log(`${name} has been cliked and is not checked`);
+  const handleClick = (grupo) => {
+    if(grupoClicked.nombre === grupo.nombre || grupo.nombre==="" ){
+      setgrupoClicked({nombre:""});
+      props.setVista((s)=>({vista:"arbol",grupo:{nombre:""}}));
+    }
+    else{
+      setgrupoClicked(grupo);
+      props.setVista((s)=>({vista:"detail",grupo:grupo}));
     }
   };
 
@@ -46,9 +44,9 @@ const SidebarContent = (props) => {
                 setGroupsCluster={props.setGroupsCluster}
                 name={grupo.nombre}
                 id={grupo.id}
-                hClick={() => handleClick(grupo, grupo.nombre)}
-                hCheck={() => handleCheck}
                 key={grupo.nombre}
+                handleClick={handleClick}
+                grupoClicked={grupoClicked}
                 groupInfo={grupo}
               />
             );
@@ -61,8 +59,6 @@ const SidebarContent = (props) => {
                 setGroupsCluster={props.setGroupsCluster}
                 name={grupo.nombre}
                 id={grupo.id}
-                hClick={() => handleClick(grupo, grupo.nombre)}
-                hCheck={() => handleCheck}
                 key={grupo.nombre}
                 groupInfo={grupo}
               />

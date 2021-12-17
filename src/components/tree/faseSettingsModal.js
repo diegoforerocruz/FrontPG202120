@@ -12,26 +12,38 @@ const FaseSettingsModal = (props) => {
 
     const Range = createSliderWithTooltip(Slider.Range);
 
-      const [numBins,setNumBins] =  useState(2);
       const [listaOpciones, setListaOpciones] = useState([]);
-      const [estructuraGrupos,setEstructuraGrupos] = useState([]);
-      const [tipoDivision, setTipoDivision] = useState({});
 
       const transformToSelect = (x) =>{
           return { value: x.valor_db , label: x.valor_traducido };
       };
 
+      const transformToSelect2 = (x) =>{
+        return { value: x, label: x };
+    };
+
       const changeSelect = (i,x) => {
         let info = (x.name).toString().split("|");
         let index = parseInt(info[0]);
         let key = info[1]
-        let newArr = Object.assign([],estructuraGrupos);
+        let newArr = Object.assign([],props.fase.estructura_grupo);
         if(key === "igual"){
           newArr[index].igual = i.map(y => {return (y.value).toString()}).join("|");
           newArr[index].limiteinf = null;
           newArr[index].limitesup = null;
         }
-        setEstructuraGrupos(newArr);
+        changeEstructuraGrupo(newArr);
+      };
+
+      const changeTipoDivision = (value) =>{
+        let newArr = Object.assign([],props.fases);
+        for(let i=0; i<newArr.length; i++){
+          if(newArr[i].fase === props.fase.fase){
+            newArr[i].tipodivision = value;
+            break;
+          }
+        }
+        props.setFases(newArr);
       };
 
       const handleButtonClick = (values) =>{
@@ -43,13 +55,12 @@ const FaseSettingsModal = (props) => {
               newArr[i].limiteinf = null;
               newArr[i].limitesup = null;
             }
-            if(tipoDivision !== "default"){
-              newArr[i].tipodivision=tipoDivision;
-              newArr[i].estructura_grupo=estructuraGrupos;
+            if(props.fase.tipodivision !== "default"){
+              newArr[i].tipodivision=props.fase.tipodivision;
+              newArr[i].estructura_grupo=props.fase.estructura_grupo;
             }
-            newArr[i].bins = values.numero_bins;
+            newArr[i].bins = props.fase.bins;
           }
-          break;
         }
         props.setFases(newArr);
         props.buildArbol(props.fase.fase);
@@ -57,46 +68,64 @@ const FaseSettingsModal = (props) => {
       };
 
       const changeRange = (x,i) => {
-        let newArr = Object.assign([],estructuraGrupos);
+        let newArr = Object.assign([],props.fase.estructura_grupo);
         newArr[i].limiteinf = x[0];
         newArr[i].limitesup = x[1];
-        setEstructuraGrupos(newArr);
+        changeEstructuraGrupo(newArr);
       };
 
 
       useEffect(() => {
           //aquí se busca la lista de opciones de la variable escogida, se devuelve error si no se ha escogido la variable
-          setTipoDivision(props.fase.tipodivision);
-          let min = props.fase.min;
-          let max = props.fase.max;
-          let newArr = Object.assign([],estructuraGrupos);
+          let newArr = Object.assign([],props.fase.estructura_grupo);
           let ltemp =  props.fase.tipo === 2 ? props.fase.significados: [];
           let chosen = ltemp.length > 0 ? []: null;
-          let limit = numBins? numBins : props.fase.bins;
+          let limit = props.fase.bins;
           let resta = parseInt(limit) - newArr.length; //si es positivo hay que agregar items al array, en caso contrario, se quitan
           if(resta>0){
             for(let i=0; i<resta; i++){
             let obj = {
               numerogrupo: (newArr.length+1),
-              limitesup: max,
-              limiteinf: min,
+              limitesup: props.fase.max,
+              limiteinf: props.fase.min,
               igual: chosen
              };
             newArr.push(obj);
             }
           }
           else if (resta <0){
-            newArr = newArr.splice(0, numBins);
+            newArr = newArr.splice(0, props.fase.bins);
           }
-          setEstructuraGrupos(newArr);
+          changeEstructuraGrupo(newArr);
           setListaOpciones(ltemp.map(x=>transformToSelect(x)));
-          //setMinMax({min:min,max:max});
-      }, [props, numBins]);
+      }, [props.fase,props.fase.bins]);
+      
+
+    useEffect(()=>{
+    },[props.fases]);
+
+    const changeEstructuraGrupo = (value) => {
+      let newArr = Object.assign([],props.fases);
+        for(let i=0; i<newArr.length; i++){
+          if(newArr[i].fase === props.fase.fase){
+            newArr[i].estructura_grupo= value;
+            break;
+          }
+        }
+      props.setFases(newArr);
+    };
 
     const handleSubmit = (values,i,o) => {};
 
-    const changeBins = (values) => {
-      setNumBins(parseInt(values));
+    const changeBins = (value) => {
+      let newArr = Object.assign([],props.fases);
+        for(let i=0; i<newArr.length; i++){
+          if(newArr[i].fase === props.fase.fase){
+            newArr[i].bins= parseInt(value);
+            break;
+          }
+        }
+      props.setFases(newArr);
     };
     /**
     const schema = Yup.object().shape({
@@ -144,10 +173,12 @@ const FaseSettingsModal = (props) => {
                             label="Por defecto"
                             name="tipodivision"
                             id="formHorizontalRadios1"
-                            value={tipoDivision ==="default"}
+                            defaultChecked ={props.fase.tipodivision ==="default"}
+                            defaultValue={props.fase.tipodivision ==="default"}
+                            value={props.fase.tipodivision ==="default"}
                             onChange={(d)=>{
                               if(d.target.checked===true){
-                                setTipoDivision("default");
+                                changeTipoDivision("default");
                               }
                             }}
                             />
@@ -155,11 +186,13 @@ const FaseSettingsModal = (props) => {
                             type="radio"
                             label="Especificar los rangos"
                             name="tipodivision"
+                            defaultChecked ={props.fase.tipodivision !== "default"}
+                            defaultValue={props.fase.tipodivision !=="default"}
                             id="formHorizontalRadios2"
-                            value={tipoDivision !== "default"}
+                            value={props.fase.tipodivision !== "default"}
                             onChange={(d)=>{
                               if(d.target.checked===true){
-                                setTipoDivision("nodefault");
+                                changeTipoDivision("nodefault");
                               }
                             }}
                             />
@@ -174,7 +207,7 @@ const FaseSettingsModal = (props) => {
                             type="number"
                             name="numero_bins"
                             placeholder={2}
-                            defaultValue={numBins}
+                            defaultValue={props.fase.bins}
                             onKeyPress={(event) => {
                               if (event.key === "Enter") {
                                 changeBins(event.target.value);
@@ -184,10 +217,10 @@ const FaseSettingsModal = (props) => {
                           </Col>
                       </Form.Group>
                       <Form.Group>
-                        {tipoDivision !== "default"?
+                        {props.fase.tipodivision !== "default"?
                           <div>
                           {props.fase.tipo === 2?
-                          estructuraGrupos.map((x,index)=>{
+                          props.fase.estructura_grupo.map((x,index)=>{
                               return (<Form.Group as={Row} className="mb-3" controlId="formHorizontal" key={index}>
                                   <Form.Label column sm={4}>
                                       grupo {x.numerogrupo}
@@ -197,16 +230,25 @@ const FaseSettingsModal = (props) => {
                                       isMulti={true}
                                       name={`${index}|igual`}
                                       onChange={changeSelect}
+                                      defaultValue={x.igual? x.igual
+                                        .toString()
+                                        .split("|")
+                                        .map(
+                                          y=>{
+                                            let foo = props.fase.significados.filter((d)=>(d.valor_db.toString() === y))[0];
+                                            return foo? transformToSelect(foo):"";
+                                          
+                                          }):[]}
                                       className="select-optional"
                                       isClearable={true}
                                       aria-labelledby="aria-label"
                                       inputId="aria-example-input"
-                                      options={listaOpciones}
+                                      options={props.fase.significados.map(x=>transformToSelect(x))}
                                       />
                                   </Col>
                               </Form.Group>)
                           }):null}
-                          {props.fase.tipo === 1?estructuraGrupos.map((x,index)=>{
+                          {props.fase.tipo === 1? props.fase.estructura_grupo.map((x,index)=>{
                               return (
                               <Form.Group as={Row} className="mb-3" controlId="formHorizontal" key={index}>
                                 <Form.Label column sm={4}>
@@ -214,7 +256,8 @@ const FaseSettingsModal = (props) => {
                                 </Form.Label>
                                 <Col sm={7}>
                                   <Row>
-                                    <Range allowCross={false}
+                                    <Range
+                                    allowCross={false}
                                     defaultValue={[x.limiteinf, x.limitesup]}
                                     min={props.fase.min}
                                     max={props.fase.max}

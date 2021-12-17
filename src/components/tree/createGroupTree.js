@@ -45,7 +45,7 @@ const CreateGroupTree = (props) => {
                         <p>Porcentaje: {parseFloat(props.estadisticas.percentage).toFixed(2)}%</p>
                       </Row>
                       <Row>
-                        <ConditionPanelCrearGrupo data={props.data} significados={props.significados}/> 
+                        <ConditionPanelCrearGrupo data_real={props.data_real} data={props.data} significados={props.significados}/> 
                       </Row>
                     </Col>
                     <Col md={5}>
