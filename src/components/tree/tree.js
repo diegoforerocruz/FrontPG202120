@@ -99,7 +99,9 @@ function Tree(props) {
     return (
       <Select
         onChange={(value) => {
-          updateFase("changeEvent",fase, null, value.value, null);
+          if(value){
+            updateFase("changeEvent",fase, null, value.value, null);
+          }
         }}
         className="select-optional"
         isClearable={true}
@@ -118,7 +120,9 @@ function Tree(props) {
     return (
       <Select
       onChange={(value) => {
-        updateFase("changeVar",fase, value.value, null, null);
+        if(value){
+          updateFase("changeVar",fase, value.value, null, null);
+        }
       }}
       className="select-optional"
       isClearable={true}
