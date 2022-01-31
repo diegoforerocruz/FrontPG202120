@@ -3,6 +3,8 @@ import "./sidebar.css";
 import Groupform from "./groupform";
 import {GrFormNextLink} from "react-icons/gr";
 import {BsCheckLg} from "react-icons/bs";
+import {AiFillDelete} from "react-icons/ai";
+import { deleteGrupo } from "../../services/gruposUtils.js"
 
 const GroupsItem = (props) => {
   const [selected, setSelected] = useState(false);
@@ -14,7 +16,21 @@ const GroupsItem = (props) => {
     props.setGroupsCluster(newArr);
   }
 
-  return (
+  const removeGroupFromDatabase = () =>{
+    if(props.tipo ==="manual"){
+      setSelected(false);
+      deleteGrupo(props.id).then((res)=>{
+        if(res["res"]==="group deleted successfuly"){
+          props.eliminarFunc(props.id,props.name,props.tipo);
+        }
+        else{
+          //indicarle al usuario que no se pudo eliminar el grupo
+        }
+      })
+    }
+  }
+
+  return(
     <div className="row my-2 lenghtgrupos" key={props.name}>
       <div className="col-12 fases">
         <button
@@ -34,6 +50,17 @@ const GroupsItem = (props) => {
           }}
         >
           {props.name}
+        </button>
+        <button
+        className="btn btn-light"
+        title="Eliminar grupo"
+        onClick={() =>{
+          if(selected){//antes de eliminarlo lo saca del tree
+            removeGroupFromnTree();
+          }
+          removeGroupFromDatabase();
+        }}>
+          <AiFillDelete/>
         </button>
         <button
         className={selected? "btn btn-danger":"btn btn-light"}

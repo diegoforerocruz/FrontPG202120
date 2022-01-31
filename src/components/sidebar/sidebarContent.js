@@ -18,6 +18,20 @@ const SidebarContent = (props) => {
     });
   }, []);
 
+  const removeFromOriginalList = (id,name,tipo) => {
+    if(tipo==="manual"){
+      let newArr = Object.assign([],grupos.grupos);
+      newArr = newArr.filter((d)=>(d.id !== id && d.nombre !== name));
+      setGrupos(s => ({...s, grupos: newArr}));
+    }
+    else if(tipo==="cluster"){
+      let newArr = Object.assign([],grupos.grupos_cluster);
+      newArr = newArr.filter((d)=>(d.id !== id && d.nombre !== name));
+      setGrupos(s => ({...s, grupos_cluster: newArr}));
+    }
+  };
+
+
   const handleClick = (grupo) => {
     if(grupoClicked.nombre === grupo.nombre || grupo.nombre==="" ){
       setgrupoClicked({nombre:""});
@@ -48,6 +62,8 @@ const SidebarContent = (props) => {
                 handleClick={handleClick}
                 grupoClicked={grupoClicked}
                 groupInfo={grupo}
+                tipo={"manual"}
+                eliminarFunc={removeFromOriginalList}
               />
             );
           })}
@@ -59,6 +75,7 @@ const SidebarContent = (props) => {
                 setGroupsCluster={props.setGroupsCluster}
                 name={grupo.nombre}
                 id={grupo.id}
+                tipo={"cluster"}
                 key={grupo.nombre}
                 groupInfo={grupo}
               />
