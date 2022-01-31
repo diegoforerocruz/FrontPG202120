@@ -31,15 +31,14 @@ const SidebarContent = (props) => {
     }
   };
 
-
   const handleClick = (grupo) => {
     if(grupoClicked.nombre === grupo.nombre || grupo.nombre==="" ){
       setgrupoClicked({nombre:""});
-      props.setVista((s)=>({vista:"arbol",grupo:{nombre:""}}));
+      props.selectItem((s)=>({nombre:""}));
     }
     else{
       setgrupoClicked(grupo);
-      props.setVista((s)=>({vista:"detail",grupo:grupo}));
+      props.selectItem((s)=>(grupo));
     }
   };
 
@@ -62,6 +61,8 @@ const SidebarContent = (props) => {
                 handleClick={handleClick}
                 grupoClicked={grupoClicked}
                 groupInfo={grupo}
+                deleted={props.deleted}
+                handleShow={props.handleShow}
                 tipo={"manual"}
                 eliminarFunc={removeFromOriginalList}
               />
@@ -74,10 +75,15 @@ const SidebarContent = (props) => {
                 groupsCluster={props.groupsCluster}
                 setGroupsCluster={props.setGroupsCluster}
                 name={grupo.nombre}
+                handleShow={props.handleShow}
+                handleClick={handleClick}
+                grupoClicked={grupoClicked}
                 id={grupo.id}
+                deleted={props.deleted}
                 tipo={"cluster"}
                 key={grupo.nombre}
                 groupInfo={grupo}
+                eliminarFunc={removeFromOriginalList}
               />
             );
           })}

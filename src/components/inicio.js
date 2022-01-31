@@ -4,14 +4,32 @@ import Tree from "./tree/tree.js";
 import { useEffect, useState } from "react";
 import { getVariables } from "../services/variablesUtils.js";
 import GrupoTreeDetail from "./tree/GrupoTreeDetail.js";
-
+import {Modal, Button} from 'react-bootstrap';
 
 
 const Inicio = () => {
 
   const [state,setState] = useState({data_real:[], variables:[], etapas: ["parto y post-parto","entorno","nacimiento","salida hospitalización","entrada Programa canguro","semana 40","mes 3","mes 6","mes 9","mes 12","entrada posición canguro","salida posición canguro"]});
   const [groupsCluster, setGroupsCluster] = useState([]);
-  const [vista, setVista]=useState({vista:"arbol",grupo:{}});
+  const [hide, setHide] = useState("");
+  const [selectedItem, setSelectedItem] = useState({});
+  const [aux, setAux] = useState({});
+  const [show, setShow] = useState({value:false,grupo:{}});
+  const [deleted, setDeleted] = useState({});
+
+  const handleClose = () => setShow({value:false,grupo:{}});
+  const handleShow = (groupInfo) => setShow({value:true,grupo:groupInfo});
+
+  const selectItem= (item) => {
+      setSelectedItem(item);
+      setHide("hideEditDisplay");
+  };
+
+  const unSelectItem= (item) => {
+      setAux(item);
+      setSelectedItem({});
+      setHide("");
+  };
 
   function groupBy(arr, criteria) {
     const newObj = arr.reduce(function (acc, currentValue) {
@@ -60,13 +78,35 @@ const Inicio = () => {
 
   return (
     <div className="row mx-1">
-      <SidebarContent setVista={setVista} className="col" setGroupsCluster={setGroupsCluster} groupsCluster={groupsCluster}/>
+      <SidebarContent deleted={deleted} handleShow={handleShow} selectItem={selectItem} className="col" setGroupsCluster={setGroupsCluster} groupsCluster={groupsCluster}/>
       <div className="col-8">
-        {vista.vista==="arbol"?
-        <Tree groupsCluster={groupsCluster} variables_real={state.variables} variables={state.variables.map(x => transformToSelect(x))} etapas={state.etapas.map(x => transformToSelectEtapas(x))} data_real={state.data_real}/>:
-        <GrupoTreeDetail grupo={vista.grupo} data_real={state.data_real}/>
-        }
+        <Tree groupsCluster={groupsCluster} variables_real={state.variables} variables={state.variables.map(x => transformToSelect(x))} etapas={state.etapas.map(x => transformToSelectEtapas(x))} data_real={state.data_real}/>
+        <div className={"fixedEditPanel "+hide}>
+          <div className={"scroll-panel variableEditAbsolute " +hide}>
+            <button onClick={() => setHide("")} className="cancelEditButton">X</button>   
+            <div className="marginEditAbsolute">
+              <GrupoTreeDetail grupo={selectedItem} data_real={state.data_real} unSelectItem={unSelectItem} setSelectedItem={setSelectedItem}/>
+            </div>
+          </div>
+        </div>
       </div>
+      <Modal show={show.value} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Eliminar grupo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>¿Está seguro de que desea eliminar el grupo: {show.grupo.nombre}?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={()=>{
+            setDeleted(show.grupo);
+            handleClose();
+          }}>
+            Eliminar grupo
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

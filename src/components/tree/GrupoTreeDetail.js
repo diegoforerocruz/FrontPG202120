@@ -9,10 +9,10 @@ const GrupoTreeDetail = (props) => {
     return (
         <div>
             <Row>
-                <h1>{props.grupo.nombre}</h1>
+                <h1>Editar: {props.grupo.nombre}</h1>
             </Row>
             <Row>
-                <Col md={6}>
+                <Col md={12}>
                     <Row>
                         <br /> 
                         <div className="fases">
@@ -23,10 +23,8 @@ const GrupoTreeDetail = (props) => {
                             <p>Porcentaje: {parseFloat(props.grupo.percentage).toFixed(2)}% de 57216</p>
                         </div>
                     </Row>
-                    <ConditionPanelCrearGrupo data={props.grupo.condiciones} data_real={props.data_real}/>
-                </Col>
-                <Col md={6}>
-
+                    <ConditionPanelCrearGrupo data={props.grupo.condiciones?props.grupo.condiciones:[]} data_real={props.data_real}/>
+                    <button className="btn btn-primary">Editar</button>
                 </Col>
             </Row>
         </div>

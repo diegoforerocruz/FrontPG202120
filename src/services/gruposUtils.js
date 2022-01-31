@@ -3,6 +3,7 @@ const ALL_URL = `${API_URL}/all`;
 const CLUSTERALL_URL = `${API_URL}/clusterall`;
 const CREATE_URL = `${API_URL}/create`;
 const DELETE_URL = (gID) => `${API_URL}/delete/${gID}`;
+const DELETE_CLUSTER_URL = (gID) => `${API_URL}/deletecluster/${gID}`;
 const BINS_URL = (bins,variable,tipo,grupoescogido) => `${API_URL}/nivel/${bins}/${variable}/${tipo}/${grupoescogido}`;
 
 export const getGruposCluster = async () => {
@@ -24,10 +25,21 @@ export const deleteGrupo = async (gId) => {
       "Content-Type": "application/json"
     },
   }).then(status).then((res) => {
-    console.log("LOGS DE ELIMINARCIÓN", res);
     return res.json();
   });
 };
+
+export const deleteGrupoCluster = async (gId) => {
+  return fetch(DELETE_CLUSTER_URL(gId),{
+    method: "DELETE",
+    headers: { 
+      "Content-Type": "application/json"
+    },
+  }).then(status).then((res) => {
+    return res.json();
+  });
+};
+
 
 export const getBins = async (bins,variable,tipo,conditions,grupoescogido) => {
   return fetch(BINS_URL(bins,variable,tipo,grupoescogido), {

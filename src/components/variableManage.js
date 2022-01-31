@@ -26,12 +26,12 @@ const VariableManage = () => {
         <div className="variableList">
             <VariablesList setAux={setAux} aux={aux} selectItem={selectItem}/>
             <div className={"fixedEditPanel "+hide}>
-            <div className={"scroll-panel variableEditAbsolute " +hide}>
-                <button onClick={() => setHide("")} className="cancelEditButton">X</button>   
-                <div className="marginEditAbsolute">
-                    <VariableEdit title={"Editar"} item={selectedItem} unSelectItem={unSelectItem} setSelectedItem={setSelectedItem}/>
+                <div className={"scroll-panel variableEditAbsolute " +hide}>
+                    <button onClick={() => setHide("")} className="cancelEditButton">X</button>   
+                    <div className="marginEditAbsolute">
+                        <VariableEdit title={"Editar"} item={selectedItem} unSelectItem={unSelectItem} setSelectedItem={setSelectedItem}/>
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
     );

@@ -10,15 +10,12 @@ const ConditionPanelCrearGrupo = (props) => {
 
     const Range = createSliderWithTooltip(Slider.Range);
 
-    const [condiciones, setCondiciones] = useState([]);
-
     const transformToSelect = (x) =>{
         return { value: x, label: x };
     };
 
     useEffect(() => {
-        setCondiciones(props.data);
-    }, []);
+    }, [props.data]);
 
     const getSelect = (listaCondiciones, seleccionado) => {
         return (
@@ -157,8 +154,8 @@ const ConditionPanelCrearGrupo = (props) => {
 
     return(
         <div>
-            <h5>Condiciones</h5>
-            {condiciones.map(c => {return <div>
+            <h5>{props.data? props.data.length > 0? "Condiciones": "": ""}</h5>
+            {props.data.map(c => {return <div>
                 {c.tipo === 1?
                 <div>
                     <Form>
