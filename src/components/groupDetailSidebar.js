@@ -46,7 +46,7 @@ const GroupDetailSidebar = (props) => {
       if (cambio1 !== cambio2) {
         try {
           const response = await fetch(
-            "http://localhost:5000/analisis/handleGroupUpdate/" +
+            "https://pgkmc.herokuapp.com/analisis/handleGroupUpdate/" +
               props.groupInfo.nombre +
               "/" +
               etapa +

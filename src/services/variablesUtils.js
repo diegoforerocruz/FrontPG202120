@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/variables";
+const API_URL = "https://pgkmc.herokuapp.com/variables";
 const ALL_URL = `${API_URL}/all`;
 const UPDATE_URL = (nombre_variable) => `${API_URL}/update/${nombre_variable}`;
 
@@ -8,23 +8,24 @@ export const getVariables = async () => {
   });
 };
 
-export const updateVariable = async (name,body) => {
+export const updateVariable = async (name, body) => {
   return fetch(UPDATE_URL(name), {
     method: "PUT",
-    headers: { 
-      "Content-Type": "application/json"
+    headers: {
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(body),
-  }).then(status)
-    .then(res => res.json())
-    .catch(function(error) {
-        console.log("Error", error);
+  })
+    .then(status)
+    .then((res) => res.json())
+    .catch(function (error) {
+      console.log("Error", error);
     });
 };
 
-function status(response) {   
-    if (response.ok) {
-        return response;
-    }
-    return response.json().then(res => Promise.reject(res));
+function status(response) {
+  if (response.ok) {
+    return response;
+  }
+  return response.json().then((res) => Promise.reject(res));
 }
