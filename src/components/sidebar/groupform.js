@@ -156,8 +156,6 @@ const Groupform = () => {
       nombregrupo: ng,
       variables: arr,
     };
-    console.log(postbody);
-    console.log(arr);
     document.getElementById("nombre1").value = "";
     fullList = [...originalState];
     setFList(fullList);

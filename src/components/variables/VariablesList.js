@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Accordion, Container, Row, Col } from 'react-bootstrap';
 import { getVariables } from "../../services/variablesUtils.js";
+import { BsFillTrashFill } from "react-icons/bs";
 import { AiTwotoneEdit } from "react-icons/ai";
 import VariableFilter from "../variables/VariableFilter.js";
+import { deleteVariable } from "../../services/variablesUtils.js";
+import {AiOutlinePlus, AiOutlineReload} from "react-icons/ai";
+
 
 
 const VariablesList = (props) => {
@@ -34,6 +38,63 @@ const VariablesList = (props) => {
             }
         }
     },[props.aux]);
+
+    /**
+    useEffect(()=>{
+        console.log("ENTRO A CREATE ITEM PROPS");
+        if(props.createdItem){
+            if(props.createdItem.nombre_general){
+                let found = false;
+                let clon = variables.reales;
+                for(let titl of clon){
+                    if (titl.title===props.createdItem.nombre_general){
+                        titl.values.push(props.createdItem);
+                        found = true;
+                        break;
+                    }
+                }
+                let clon2 = variables.filtradas;
+                for(let title of clon2){
+                    if (title.title===props.createdItem.nombre_general){
+                        title.values.push(props.createdItem);
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found){
+                    let newCreated = {
+                        title:props.createdItem.nombre_general,
+                        values:[props.createdItem]
+                    }
+                    clon.push(newCreated);
+                    clon2.push(newCreated);
+                }
+                setVariables((s)=>({...s, filtradas:clon2,reales:clon}));
+            }
+        }
+    },[props.createdItem]);
+    */
+
+    useEffect(()=>{
+        if(props.deleted){
+            if(props.deleted.nombre_general){
+                deleteVariable(props.deleted.nombre_real).then((res)=>{
+                    if(res["res"]==="variable deleted successfuly"){
+                        let newObj = Object.assign({},variables);
+                        //props.deleted.nombre_real
+                        for (let vvv of newObj.filtradas){
+                            if(vvv.title === props.deleted.nombre_general){
+                                vvv.values = vvv.values.filter(d=> (d.nombre_real!== props.deleted.nombre_real));
+                                break;
+                            }
+                        }
+                        setVariables(newObj);
+                    }
+                });
+            }
+        }
+    },
+    [props.deleted]);
 
     function groupBy(arr, criteria) {
         const newObj = arr.reduce(function (acc, currentValue) {
@@ -69,7 +130,9 @@ const VariablesList = (props) => {
                 return { value: t, label: t };
             })}));
         });
+        
     },[]);
+
     
     return(
         <div className="marginLeftTitle">
@@ -81,9 +144,9 @@ const VariablesList = (props) => {
                 <br/><br/>
                     <Accordion>
                     {
-                    variables.filtradas.map(
+                    variables.filtradas?variables.filtradas.map(
                         val => { 
-                        return <Accordion.Item eventKey={val.title}>
+                        return <Accordion.Item eventKey={val.title} key={val.title}>
                         <Accordion.Header>
                             <div className="fases">
                                 <div className="ac-item">{val.title}</div>
@@ -93,6 +156,7 @@ const VariablesList = (props) => {
                             <Table bordered hover>
                                 <thead>
                                     <tr>
+                                        <th></th>
                                         <th></th>
                                         <th>Nombre real</th>
                                         <th>Evento</th>
@@ -105,8 +169,9 @@ const VariablesList = (props) => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {val.values.map(variable => {
+                                    {val.values? val.values.map(variable => {
                                     return <tr>
+                                        <td><Button onClick={() => props.handleShow(variable)}><BsFillTrashFill/></Button></td>
                                         <td><Button onClick={() => props.selectItem(variable)}><AiTwotoneEdit/></Button></td>
                                         <td>{variable.nombre_real}</td>
                                         <td>{variable.evento}</td>
@@ -117,12 +182,12 @@ const VariablesList = (props) => {
                                         <td>{variable.evento_final}</td>
                                         <td>{variable.etapa}</td>
                                     </tr>
-                                    })}
+                                    }):null}
                                 </tbody>
                             </Table>
                         </Accordion.Body>
                     </Accordion.Item>;
-                    })}
+                    }):null}
                     </Accordion>
                 </Col>
                 <Col md={4}>
@@ -130,6 +195,8 @@ const VariablesList = (props) => {
                     <h3>Filtrar</h3>
                     <br/><br/>
                     <VariableFilter etapas={variables.etapas} reales={variables.reales} variables={variables} setVariables={setVariables} />
+                    <br/><br/>
+                    <Button onClick={() => props.createVariable()}><AiOutlinePlus/> Agregar variable</Button>
                 </Col>
             </Row>
         </Container>

@@ -41,11 +41,6 @@ function App() {
                     Gestión de variables
                   </Link>
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/TemasManage">
-                    Gestión temas de interés
-                  </Link>
-                </li>
               </ul>
             </div>
           </div>

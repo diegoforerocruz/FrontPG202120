@@ -83,6 +83,7 @@ const GroupsItem = (props) => {
         }}>
           <AiFillDelete/>
         </button>
+        {props.tipo ==="cluster"?null:
         <button
         className={selectedEdit? "btn btn-primary":"btn btn-light"}
         title="Editar grupo"
@@ -112,6 +113,7 @@ const GroupsItem = (props) => {
         }}>
           <AiFillEdit/>
         </button>
+        }
         <button
         title="Añadir al arbol"
         className={selected? "btn btn-danger buttongrupos":"btn btn-light buttongrupos"}

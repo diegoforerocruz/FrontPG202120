@@ -31,7 +31,6 @@ class TreeClass{
     }
 
     addChildren(node,children){
-        console.log("addChildren",node,children);
         this.findChildren(this.root,(d)=>{return d.uid===node.uid} ,(n)=>{
             n.children = children;
         });

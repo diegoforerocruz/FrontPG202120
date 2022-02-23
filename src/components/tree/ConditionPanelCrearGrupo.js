@@ -1,27 +1,57 @@
 import React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useReducer } from "react";
 import Select from "react-select";
 import {Row, Col, Form} from 'react-bootstrap';
 import RangeSlider from "../tree/RangeSlider.js";
 import Slider, { createSliderWithTooltip } from 'rc-slider';
 
 
+
 const ConditionPanelCrearGrupo = (props) => {
+
+    const [ignored, forceUpdate] = useReducer(x => x + 1, 0);
 
     const Range = createSliderWithTooltip(Slider.Range);
 
-    const transformToSelect = (x) =>{
-        return { value: x, label: x };
+    const transformToSelect = (x,y) =>{
+        return { value: x, label: y };
+    };
+
+    const transformToSelect2 = (x) =>{
+        return { value: x.valor_db , label: x.valor_traducido };
     };
 
     useEffect(() => {
+        forceUpdate();
     }, [props.data]);
 
-    const getSelect = (listaCondiciones, seleccionado) => {
+    const changeSelect = (x,i,varSelect) =>{
+        let newArr = Object.assign([],props.data);
+        let vSelect = newArr.filter((d)=>(d.variable===varSelect))[0];
+        if(vSelect){
+            let temp = x.map(y => {return (y.value).toString()}).join("|");
+            vSelect.igual = temp===""?null:temp;
+        }
+        props.setGrupo((s)=>({...s,condiciones:newArr}));
+    };
+
+    const changeRange = (x,varSelect) => {
+        let newArr = Object.assign([],props.data);
+        let vSelect = newArr.filter((d)=>(d.variable===varSelect))[0];
+        if(vSelect){
+            vSelect.limiteinf = x[0];
+            vSelect.limitesup = x[1];
+        }
+        props.setGrupo((s)=>({...s,condiciones:newArr}));
+    };
+
+    const getSelect = (listaCondiciones, seleccionado,changeSelect,varSelect,id) => {
+        console.log("AAAAAAAAAAAA",seleccionado,id);
         return (
           <Select
             isMulti={true}
-            isDisabled={true}
+            key={`slider-${id}`}
+            onChange={(x,i)=>changeSelect(x,i,varSelect)}
             className="select-optional"
             isClearable={true}
             aria-labelledby="aria-label"
@@ -54,13 +84,13 @@ const ConditionPanelCrearGrupo = (props) => {
                     <Col sm={7}>
                         <Row>
                             <Range allowCross={false}
-                            value={[igual?igual:limiteinf, igual?igual:limitesup]}
+                            defaultValue={[igual?igual:limiteinf, igual?igual:limitesup]}
                             min={igual?igual-100:limitesup-100}
                             max={igual?igual+50:limitesup+50}
                             disabled={false}
                             step={5}
                             onChange={()=>{}}
-                            onAfterChange={value => {}}
+                            onAfterChange={value => {changeRange(value,nombre)}}
                             />
                         </Row>
                         <Row>
@@ -121,22 +151,12 @@ const ConditionPanelCrearGrupo = (props) => {
         p = p.map((x)=>{
             let found = sigs.filter((d)=>(parseInt(d.valor_db) === parseInt(x)))[0];
             if(found){
-                return found.valor_traducido;
+                return found;
             }
             else return x;
         });
-
-        /**
-        if(props.significados){
-            p = p.map((x)=>{
-                let found = props.significados.filter((d)=>(parseInt(d.valor_db) === parseInt(x)))[0];
-                if(found){
-                    return found.valor_traducido;
-                }
-                else return x;
-            });
-        }*/
-        let p2 = p.map(x =>transformToSelect(x));
+        let p2 = p.map(x =>transformToSelect(x.valor_db?x.valor_db:x,x.valor_traducido?x.valor_traducido:x));
+        let sigs2 = sigs.map(x=>transformToSelect2(x));
         return (
         <Form>
             <Form.Group as={Row} className="mb-3" controlId="formHorizontalUnidad">
@@ -145,7 +165,7 @@ const ConditionPanelCrearGrupo = (props) => {
                     <p className="smalltext">{etapa_final}</p>
                 </Form.Label>
                 <Col sm={6}>
-                    {getSelect(p2,p2)}
+                    {getSelect(sigs2,p2,changeSelect,nombre,nombre_final+etapa_final)}
                 </Col>
             </Form.Group>
         </Form>

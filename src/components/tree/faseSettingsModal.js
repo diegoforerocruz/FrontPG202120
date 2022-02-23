@@ -15,12 +15,12 @@ const FaseSettingsModal = (props) => {
       const [listaOpciones, setListaOpciones] = useState([]);
 
       const transformToSelect = (x) =>{
-          return { value: x.valor_db , label: x.valor_traducido };
+        return { value: x.valor_db , label: x.valor_traducido };
       };
 
       const transformToSelect2 = (x) =>{
         return { value: x, label: x };
-    };
+      };
 
       const changeSelect = (i,x) => {
         let info = (x.name).toString().split("|");
@@ -204,6 +204,7 @@ const FaseSettingsModal = (props) => {
                           </Form.Label>
                           <Col sm={8}>
                             <Form.Control
+                            maxLength="10"
                             type="number"
                             name="numero_bins"
                             placeholder={2}
@@ -292,7 +293,7 @@ const FaseSettingsModal = (props) => {
                                           size="sm"
                                           width="50px"
                                           className="right size-small"
-                                          onChange={(x,i) => {console.log("yo no se",x,i)}}/>
+                                          onChange={(x,i) => {console.log("",x,i)}}/>
                                         </div>
                                       </div>
                                     </div>

@@ -2,6 +2,7 @@ const API_URL = "http://localhost:5000/grupos";
 const ALL_URL = `${API_URL}/all`;
 const CLUSTERALL_URL = `${API_URL}/clusterall`;
 const CREATE_URL = `${API_URL}/create`;
+const UPDATE_URL = (gID) => `${API_URL}/update/${gID}`;
 const DELETE_URL = (gID) => `${API_URL}/delete/${gID}`;
 const DELETE_CLUSTER_URL = (gID) => `${API_URL}/deletecluster/${gID}`;
 const BINS_URL = (bins,variable,tipo,grupoescogido) => `${API_URL}/nivel/${bins}/${variable}/${tipo}/${grupoescogido}`;
@@ -62,6 +63,18 @@ export const createGroup = async (conditions) => {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(conditions),
+  }).then((res) => {
+    return res.json();
+  });
+};
+
+export const updateGroup = async (id,body) => {
+  return fetch(UPDATE_URL(id), {
+    method: "PUT",
+    headers: { 
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body),
   }).then((res) => {
     return res.json();
   });

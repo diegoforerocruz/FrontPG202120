@@ -31,8 +31,6 @@ const FormNumField = (props) => {
 
   const hacer = () => {
     let arr = [];
-    console.log("entramos");
-    console.log(props.createObject);
     for (let i = 0; i < props.createObject.lenght; i++) {
       if (props.createObject[i].variable != props.namevar) {
         arr.push(props.createObject[i]);
@@ -41,16 +39,10 @@ const FormNumField = (props) => {
 
     arr.push(specific);
     props.setcreateObject(arr);
-    console.log(props.createObject);
-
-    console.log("salimos");
   };
 
   useEffect(() => {}, []);
 
-  //console.log(lowerLimit);
-  //console.log(upperLimit);
-  //console.log(specific);
   return (
     <div className="mb-3">
       <div>

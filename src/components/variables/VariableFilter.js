@@ -9,7 +9,7 @@ import { Formik, Field, ErrorMessage, FieldArray } from "formik";
 
 const VariableFilter = (props) => {
 
-    const [filterData, setFilterData] = useState({text:"",tipo:0,tiempo: ""});
+    const [filterData, setFilterData] = useState({text:"",tipo1:0,tipo2:0,tiempo: ""});
 
 
     const filt = (d) =>{
@@ -17,11 +17,11 @@ const VariableFilter = (props) => {
         let textoCond = true;
         if(filterData.text !== ""){
             let f = filterData.text.toLowerCase();
-            textoCond = d.nombre_real?d.nombre_real.toLowerCase().includes(f):false || d.unidad? d.unidad.toLowerCase().includes(f):false || d.etiqueta?d.etiqueta.toLowerCase().includes(f):false || d.nombre_general?d.nombre_general.toLowerCase().includes(f):false;
+            textoCond = d.nombre_real?d.nombre_real.toLowerCase().includes(f):false || d.unidad? d.unidad.toLowerCase().includes(f):false || d.etiqueta?d.etiqueta.toLowerCase().includes(f):false || d.nombre_general?d.nombre_general.toLowerCase().includes(f):false || d.etapa?d.etapa.toLowerCase().includes(f):false || d.evento?d.evento.toLowerCase().includes(f):false || d.evento_inicial?d.evento_inicial.toLowerCase().includes(f):false || d.evento_final?d.evento_final.toLowerCase().includes(f):false;
         }
         let tipoCond = true;
-        if(filterData.tipo !== 0){
-            tipoCond = parseInt(d.tipo) === parseInt(filterData.tipo)
+        if(filterData.tipo1 !== 0){
+            tipoCond = parseInt(d.tipo) === 2
         }
         let tiempoCond = true;
         if(filterData.tiempo !== ""){
@@ -36,11 +36,15 @@ const VariableFilter = (props) => {
             let newArr = Object.assign([], props.reales);
             let rta = [];
             for (let i = 0; i < newArr.length; i++){
-                let copia = Object.assign(newArr[i].values);
-                copia = copia.filter(filt);
-                if (copia.length > 0){
-                    newArr[i].values = copia;
-                    rta.push(newArr[i]);
+                if(newArr[i].values){
+                    let copia = Object.assign(newArr[i].values);
+                    if(copia){
+                        copia = copia.filter(filt);
+                        if (copia.length > 0){
+                            newArr[i].values = copia;
+                            rta.push(newArr[i]);
+                        }
+                    }
                 }
             }
             props.setVariables((s)=>({...s,filtradas:rta}));
@@ -72,7 +76,8 @@ const VariableFilter = (props) => {
             <Formik
                 onSubmit={handleSubmit}
                 initialValues={{
-                tipo: 0,
+                tipo1: 0,
+                tipo2:0,
                 }}
               >
               {({ handleSubmit, handleChange, values, errors, setFieldValue }) => (
@@ -91,48 +96,6 @@ const VariableFilter = (props) => {
                             placeholder={"Buscar"} />
                             </Col>
                         </Form.Group>
-                    </Row>
-                    <Row>
-                        <Form.Group as={Row} className="mb-3" controlId="formHorizontalTipo">
-                            <Form.Label column sm={4}>
-                                Tipo
-                            </Form.Label>
-                            <Col sm={8}>
-                                <Form.Check
-                                type="radio"
-                                label="Categórica"
-                                name="tipo"
-                                id="formHorizontalRadiosTipo1"
-                                onChange={(d)=>{
-                                    console.log("SELECTED");
-                                    if(d.target.checked===true){
-                                        setFilterData((s)=>({...s,tipo:2}));
-                                    }
-                                    else{
-                                        setFilterData((s)=>({...s,tipo:0}));
-                                    }
-                                }}
-                                />
-                                <Form.Check
-                                type="radio"
-                                label="Numérica"
-                                name="tipo"
-                                id="formHorizontalRadiosTipo2"
-                                onChange={(d)=>{
-                                    if(d.target.checked===true){
-                                        setFilterData((s)=>({...s,tipo:1}));
-                                    }
-                                    else{
-                                        setFilterData((s)=>({...s,tipo:0}));
-                                    }
-                                }}
-                                />
-                            </Col>
-                        </Form.Group>
-                    </Row>
-                    <Row>
-                        <p>Evento/etapa:</p>
-                        {geteventosTemporales(props.etapas)}
                     </Row>
                 </Form>
               )}

@@ -9,14 +9,28 @@ const SidebarContent = (props) => {
   const [grupoClicked, setgrupoClicked] = useState({nombre:""});
   const [grupos,setGrupos] = useState({grupos:[],grupos_cluster:[]});
 
-  useEffect(() => {
+  const updateGrupos = () => {
     getGrupos().then((res) => {
       setGrupos(s => ({...s, grupos: res}));
     });
     getGruposCluster().then((res) => {
       setGrupos(s => ({...s, grupos_cluster: res}));
     });
+  };
+
+  useEffect(()=>{
+    if(props.groupCreated){
+      setGrupos(s => ({...s, grupos: [...s.grupos,props.groupCreated]}));
+    }
+  },[props.groupCreated]);
+
+  useEffect(() => {
+    updateGrupos();
   }, []);
+
+  useEffect(() => {
+    if(props.edited)updateGrupos();
+  }, [props.edited]);
 
   const removeFromOriginalList = (id,name,tipo) => {
     if(tipo==="manual"){

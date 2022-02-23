@@ -1,5 +1,6 @@
 import React from "react";
 import * as d3 from "d3";
+import { saveAs } from 'file-saver';
 import { useEffect, useRef, useState } from "react";
 import { getBins } from "../../services/gruposUtils.js";
 import CreateGroupTree from "../tree/createGroupTree.js";
@@ -10,12 +11,17 @@ import { AiOutlineReload } from 'react-icons/ai';
 import Select from "react-select";
 import TreeClass from "./TreeClass.js";
 
+
 function Tree(props) {
 
   const d3ToPng = require('d3-svg-to-png');
 
   const [listaTrees, setListaTrees] = useState({lista:{},flag:{}});
   const [listaTreesC, setListaTreesC] = useState({lista:{},flag:{}});
+
+  var JSZip = require("jszip");
+  let zip = new JSZip();
+  let photoZip = zip.folder(`arboles.zip`);
 
   const customStyles = {
     control: (provided, state) => ({
@@ -208,11 +214,17 @@ function Tree(props) {
         scale: 1,
         format: 'png',
         quality: 0.92,
-        download: true,
         ignore: null,
+        download: false,
         width:900,
         cssinline: 1
       }).then(fileData => {
+        photoZip.file(`diagrama arbol ${i}.png`,fileData.split('base64,')[1],{base64: true});
+        if(Object.keys(listaTreesC.lista).length === 0 && parseInt(i) === (Object.keys(listaTrees.lista).length-1)){
+          downloadZip();
+          d3.selectAll(".listaTreeDownload").remove();
+          d3.selectAll(".listaTreeCDownload").remove();
+        }
       });
     }
     for (let i of Object.keys(listaTreesC.lista)){
@@ -220,13 +232,25 @@ function Tree(props) {
         scale: 1,
         format: 'png',
         quality: 0.92,
-        download: true,
         ignore: null,
+        download:false,
         width:900,
         cssinline: 1
       }).then(fileData => {
+        photoZip.file(`diagrama arbol grupo ${i}.png`,fileData.split('base64,')[1],{base64: true});
+        if(parseInt(i) === (Object.keys(listaTreesC.lista).length-1)){
+          downloadZip();
+          d3.selectAll(".listaTreeDownload").remove();
+          d3.selectAll(".listaTreeCDownload").remove();
+        }
       });
     }
+  };
+
+  const downloadZip = () => {
+    zip.generateAsync({type:"blob"}).then(function(content) {
+      saveAs(content, `arboles.zip`);
+    });
   };
 
   useEffect(() => {
@@ -622,10 +646,13 @@ function Tree(props) {
                 res = res.filter((d)=>(d.igual!=="no hay dato"));//o no está en significados
                 let tempArr2 = [];
                 for (let response of res){
-                  let traduccion = null;
+                  let traduccion = "";
                   if(item.tipo === 2 && var_act[0]){
-                    let lista_respuestas = var_act[0].significados.filter((f)=>(parseInt(f.valor_db) === parseInt(response.igual)));
-                    if(lista_respuestas[0])traduccion=lista_respuestas[0].valor_traducido;
+                    let listaigual = response.igual.toString().split("|");
+                    for (let itemigual of listaigual){
+                      let lista_respuestas = var_act[0].significados.filter((f)=>(parseInt(f.valor_db) === parseInt(itemigual)));
+                      if(lista_respuestas[0])traduccion+=lista_respuestas[0].valor_traducido+"\n";
+                    }
                   }
                   let r = JSON.parse(JSON.stringify(convertToTree(response,item.fase,hoja,hoja.grupo,traduccion,hoja.tipo_arbol,hoja.datasource)));
                   tempArr2.push(r);
@@ -650,12 +677,15 @@ function Tree(props) {
         let varObject = props.data_real.filter((d)=>(d.nombre_real === pVar))[0];
         let listaNewNodos = [];
         for (let nodo of res){
-          let traduccion = null;
+          let traduccion = "";
           if(pTipo === 2 && varObject){
-            let significado = varObject.significados.filter((f)=>( (f.valor_db).toString() === (nodo.igual).toString() ))[0];
-            if(significado)traduccion= significado.valor_traducido;
+            let listaigual = nodo.igual.toString().split("|");
+            for(let itemigual of listaigual){
+              let significado = varObject.significados.filter((f)=>( (f.valor_db).toString() === (itemigual).toString() ))[0];
+              if(significado)traduccion+=significado.valor_traducido+"\n";
+            }
           }
-          if((pTipo === 1 && nodo.igual !== "no hay dato")||(pTipo === 2 && traduccion !== null && nodo.igual !== "no hay dato")){
+          if((pTipo === 1 && nodo.igual !== "no hay dato")||(pTipo === 2 && traduccion !== null && traduccion !== ""  && nodo.igual !== "no hay dato")){
             let r = JSON.parse(JSON.stringify(convertToTree(nodo,`fase${numFaseActual}`,pPadre,pGrupoNodoPadre,traduccion,pDataSource,pTipoArbol)));
             listaNewNodos.push(r);
           }
@@ -854,7 +884,7 @@ function Tree(props) {
     <div ref={canvas} id="canvas"></div>
     <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
     <div ref={canvasDownload}></div>
-    <CreateGroupTree show={show.show} setShow={setShow} data={show.data} significados={show.significados} datasource={show.datasource} estadisticas={show.estadisticas} data_real={props.data_real}/>
+    <CreateGroupTree setGroupCreated={props.setGroupCreated} show={show.show} setShow={setShow} data={show.data} significados={show.significados} datasource={show.datasource} estadisticas={show.estadisticas} data_real={props.data_real}/>
     <FaseSettingsModal show={showFaseSettings.show} setShow={setShowFaseSettings} fase={showFaseSettings.fase} setFases={setFases} fases={fases} buildArbol={buildArbol}/>
   </div>
   );

@@ -16,6 +16,8 @@ const Inicio = () => {
   const [aux, setAux] = useState({});
   const [show, setShow] = useState({value:false,grupo:{}});
   const [deleted, setDeleted] = useState({});
+  const [edited, setEdited] = useState(false);
+  const [groupCreated,setGroupCreated] = useState(null);
 
   const handleClose = () => setShow({value:false,grupo:{}});
   const handleShow = (groupInfo) => setShow({value:true,grupo:groupInfo});
@@ -78,14 +80,14 @@ const Inicio = () => {
 
   return (
     <div className="row mx-1">
-      <SidebarContent deleted={deleted} handleShow={handleShow} selectItem={selectItem} className="col" setGroupsCluster={setGroupsCluster} groupsCluster={groupsCluster}/>
+      <SidebarContent groupCreated={groupCreated} edited={edited} deleted={deleted} handleShow={handleShow} selectItem={selectItem} className="col" setGroupsCluster={setGroupsCluster} groupsCluster={groupsCluster}/>
       <div className="col-8">
-        <Tree groupsCluster={groupsCluster} variables_real={state.variables} variables={state.variables.map(x => transformToSelect(x))} etapas={state.etapas.map(x => transformToSelectEtapas(x))} data_real={state.data_real}/>
+        <Tree setGroupCreated={setGroupCreated} groupsCluster={groupsCluster} variables_real={state.variables} variables={state.variables.map(x => transformToSelect(x))} etapas={state.etapas.map(x => transformToSelectEtapas(x))} data_real={state.data_real}/>
         <div className={"fixedEditPanel "+hide}>
           <div className={"scroll-panel variableEditAbsolute " +hide}>
             <button onClick={() => setHide("")} className="cancelEditButton">X</button>   
             <div className="marginEditAbsolute">
-              <GrupoTreeDetail grupo={selectedItem} data_real={state.data_real} unSelectItem={unSelectItem} setSelectedItem={setSelectedItem}/>
+              <GrupoTreeDetail setHide={setHide} setEdited={setEdited} grupo={selectedItem} nombre={selectedItem.nombre} data_real={state.data_real} unSelectItem={unSelectItem} setSelectedItem={setSelectedItem}/>
             </div>
           </div>
         </div>

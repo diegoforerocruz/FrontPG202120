@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import {createGroup} from "../../services/gruposUtils.js";
 import ConditionPanelCrearGrupo from "../tree/ConditionPanelCrearGrupo.js";
 import { Formik } from "formik";
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const CreateGroupTree = (props) => {
@@ -15,14 +16,28 @@ const CreateGroupTree = (props) => {
                 variables: props.data,
                 datasource: props.datasource
               };
-      createGroup(request).then((res)=>{
-        console.log("SUBMIT", res);
-        handleClose();
-      });
+      if(!(/^[a-z_](?:[a-z0-9_]{0,30})?$/.test(request.nombregrupo))){
+        toast.error("El nombre del grupo solo puede contener minúsculas, digitos o guiones bajos (_). No puede comenzar por digitos");
+      }
+      else{
+        createGroup(request).then((res)=>{
+          if(res){
+            if(res["error"]){
+                toast.error(res["error"].replace("404 Not Found: ",""));
+            }
+            else{
+                toast.success("Grupo creado exitosamente");
+                props.setGroupCreated(res);
+                handleClose();
+            }
+          }
+        });
+      }
     };
 
     return (
-        <>    
+        <>
+          <ToastContainer/>
           <Modal show={props.show} onHide={handleClose} size="lg">
             <Modal.Header closeButton>
               <Modal.Title>Agregar grupo</Modal.Title>
