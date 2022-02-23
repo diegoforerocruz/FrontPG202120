@@ -198,7 +198,7 @@ const GroupManage = () => {
     try {
       const body = postbody;
       const response = await fetch(
-        "http://localhost:5000/analisis/clusteringGroups",
+        "https://pgkmc.herokuapp.com/analisis/clusteringGroups",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -219,7 +219,7 @@ const GroupManage = () => {
   const getGruposCluster = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/analisis/getallclustergroups"
+        "https://pgkmc.herokuapp.com/analisis/getallclustergroups"
       );
       const jsonData = await response.json();
 

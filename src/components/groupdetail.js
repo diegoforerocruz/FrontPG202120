@@ -136,7 +136,7 @@ const Groupdetail = (props) => {
   const handleGroupHistory = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/analisis/getgrouphistory/" +
+        "https://pgkmc.herokuapp.com/analisis/getgrouphistory/" +
           selectedBar[0] +
           "/" +
           selectedBar[1] +
@@ -176,7 +176,7 @@ const Groupdetail = (props) => {
   const handleDeleteGroup = async (nombre) => {
     try {
       const response = await fetch(
-        "http://localhost:5000/analisis/deleteGroup/" + nombre,
+        "https://pgkmc.herokuapp.com/analisis/deleteGroup/" + nombre,
         { method: "DELETE" }
       );
       window.location.reload();
